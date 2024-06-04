@@ -14,7 +14,7 @@ class _LoadingState extends State<Loading> {
     super.initState();
     // Add your data fetching logic here
     // For example, you can use Future.delayed to simulate data fetching
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(hours: 2), () {
       Navigator.pushReplacementNamed(context, '/home');
     });
   }
