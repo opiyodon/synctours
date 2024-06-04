@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:synctours/theme/colors.dart';
 
 class Loading extends StatefulWidget {
@@ -25,9 +24,8 @@ class _LoadingState extends State<Loading> {
     return const Scaffold(
       backgroundColor: AppColors.background,
       body: Center(
-        child: SpinKitSpinningLines(
-          color: Colors.black,
-          size: 80.0,
+        child: Image(
+          image: AssetImage('assets/icon/logo.png'),
         ),
       ),
     );
