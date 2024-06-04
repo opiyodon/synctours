@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:synctours/theme/colors.dart';
 
 class Loading extends StatefulWidget {
@@ -22,14 +21,16 @@ class _LoadingState extends State<Loading> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppColors.background,
+    return Scaffold(
+      backgroundColor: AppColors.loadingBackground,
       body: Center(
-        child: SpinKitSpinningLines(
-          color: Colors.black,
-          size: 80.0,
+        child: Image.asset(
+          'assets/icon/logo.png',
+          width: 170.0,
+          height: 180.0,
         ),
       ),
     );
   }
 }
+
