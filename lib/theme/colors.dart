@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Warm Vibes
-  static const Color primary = Color(0xFFD32F2F); // Warm Red for excitement
+  // Main Theme Colors
   static const Color secondary = Color(0xFF8E44AD); // Deep Purple for happiness
   static const Color accent = Color(0xFFFF7043); // Warm Coral for energy
   static const Color background = Color(0xFFFFCCBC); // Light Peach for warmth
 
-  // Loading Page
-  static const Color loadingBackground = Color(0xFF8D27A7); // Deep Purple[700]
+  // Gradient for Loading & Auth Page Background
+  static const LinearGradient loadingBackground = LinearGradient(
+    begin: Alignment.topRight,
+    end: Alignment.bottomLeft,
+    colors: [
+      Color(0xFFFF7043), // Warm Coral at the bottom right
+      Color(0xFF8D27A7), // Deep Purple[700] at the top left
+    ],
+  );
 
-  // Auth Page & Main Page Text
-  static const Color authMainText =
-      Color(0xFF212121); // Dark grey for readability
-
-  // Buttons
-  static const Color buttonBackground =
-      Color(0xFF6D4C41); // Brown accent for a warm 'Go'
+  // Navbar, Icons, and Buttons
+  static const Color navbarBackground = Color(0xFF8D27A7); // Deep Purple for consistency
+  static const Color iconColor = Color(0xFFBA68C8); // Lighter Purple for friendly neutrality
+  static const Color buttonBackground = Color(0xFFBA68C8); // Lighter Purple for a friendly 'Go'
   static const Color buttonText = Color(0xFFFFFFFF); // White for contrast
 
-  // Text Fields
-  static const Color textFieldFill = Color(0xFFFFFFFF); // White for clarity
-  static const Color textFieldBorder = Color(0xFFBDBDBD); // Grey for subtlety
+  // Text and Borders
+  static const Color mainText = Color(0xFF212121); // Dark grey for readability
+  static const Color secondaryText = Color(0xFF757575); // Grey for less emphasis
+  static const Color textFieldBorder = Color(0xFFD1C4E9); // Light Purple for subtlety
+  static const Color divider = Color(0xFFD1C4E9); // Light Purple for separation
 
-  // Icons
-  static const Color iconColor = Color(0xFF757575); // Grey for neutrality
-
-  // Miscellaneous
-  static const Color divider = Color(0xFFBDBDBD); // Grey for separation
-  static const Color error = Color(0xFFF44336); // Red for alerts
-  static const Color success = Color(0xFF4CAF50); // Green for success messages
+  // Alerts and Messages
+  static const Color error = Color(0xFFE57373); // Soft Red for alerts
+  static const Color success = Color(0xFF81C784); // Soft Green for success message
 }

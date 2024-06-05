@@ -22,12 +22,16 @@ class _LoadingState extends State<Loading> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.loadingBackground,
-      body: Center(
-        child: Image.asset(
-          'assets/icon/logo.png',
-          width: 220.0,
-          height: 220.0,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppColors.loadingBackground,
+        ),
+        child: Center(
+          child: Image.asset(
+            'assets/icon/logo.png',
+            width: 220.0,
+            height: 220.0,
+          ),
         ),
       ),
     );
