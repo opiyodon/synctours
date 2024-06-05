@@ -14,21 +14,22 @@ class _LoadingState extends State<Loading> {
     super.initState();
     // Add your data fetching logic here
     // For example, you can use Future.delayed to simulate data fetching
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacementNamed(context, '/authentication_page');
+    Future.delayed(const Duration(seconds: 5), () {
+      Navigator.pushReplacementNamed(context, '/authentication');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: AppColors.loadingBackground,
       body: Center(
-        child: Image(
-          image: AssetImage('assets/icon/logo.png'),
+        child: Image.asset(
+          'assets/icon/logo.png',
+          width: 220.0,
+          height: 220.0,
         ),
       ),
     );
   }
 }
-

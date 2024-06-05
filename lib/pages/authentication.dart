@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:synctours/theme/colors.dart'; // Assuming you have a custom color file
 
-class AuthenticationPage extends StatelessWidget {
-  const AuthenticationPage({Key? key});
+class Authentication extends StatelessWidget {
+  const Authentication({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary, // Using warm red as the background color
-      body: Padding(
-        padding: const EdgeInsets.only(top: 60.0),
-        child: Center(
+      backgroundColor:
+          AppColors.loadingBackground, // Using warm red as the background color
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 100.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Image.asset(
                 'assets/icon/logo.png',
@@ -32,10 +33,13 @@ class AuthenticationPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Navigate to the login page
+                  Navigator.pushNamed(context, '/login');
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.buttonBackground, // Using brown accent for button background
-                  padding: const EdgeInsets.symmetric(horizontal: 130.0, vertical: 10.0),
+                  backgroundColor: AppColors
+                      .accent, // Using brown accent for button background
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 130.0, vertical: 10.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),
@@ -44,7 +48,8 @@ class AuthenticationPage extends StatelessWidget {
                   'Log In',
                   style: TextStyle(
                     fontSize: 18.0,
-                    color: AppColors.buttonText, // Using white color for contrast
+                    color:
+                        AppColors.buttonText, // Using white color for contrast
                   ),
                 ),
               ),
@@ -52,41 +57,24 @@ class AuthenticationPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Navigate to the sign-up page
+                  Navigator.pushNamed(context, '/sign_up');
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:  Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 130.0, vertical: 10.0),
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 130.0, vertical: 10.0),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    side: const BorderSide(color: AppColors.primary), // Using warm red as border color
+                    borderRadius: BorderRadius.circular(
+                        30.0), // Using warm red as border color
                   ),
                 ),
                 child: const Text(
                   'Sign Up',
                   style: TextStyle(
                     fontSize: 18.0,
-                    color: AppColors.primary, // Using warm red as text color
+                    color: AppColors.accent, // Using warm red as text color
                   ),
                 ),
-              ),
-              const SizedBox(height: 20.0),
-              TextButton(
-                onPressed: () {
-                  // Continue as guest action
-                },
-                child: const Text(
-                  'Continue as guest',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: AppColors.authMainText, // Using white color for contrast
-                  ),
-                ),
-              ),
-              const Spacer(),
-              Image.asset(
-                'assets/icon/logo.png',
-                width: 100.0, // Adjust size as needed
-                height: 50.0,
               ),
             ],
           ),

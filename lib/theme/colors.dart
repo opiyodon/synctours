@@ -8,13 +8,15 @@ class AppColors {
   static const Color background = Color(0xFFFFCCBC); // Light Peach for warmth
 
   // Loading Page
-  static const Color loadingBackground = Color(0xFF6A1B9A); // Deep Purple[700]
+  static const Color loadingBackground = Color(0xFF8D27A7); // Deep Purple[700]
 
   // Auth Page & Main Page Text
-  static const Color authMainText = Color(0xFF212121); // Dark grey for readability
+  static const Color authMainText =
+      Color(0xFF212121); // Dark grey for readability
 
   // Buttons
-  static const Color buttonBackground = Color(0xFF6D4C41); // Brown accent for a warm 'Go'
+  static const Color buttonBackground =
+      Color(0xFF6D4C41); // Brown accent for a warm 'Go'
   static const Color buttonText = Color(0xFFFFFFFF); // White for contrast
 
   // Text Fields
@@ -29,4 +31,3 @@ class AppColors {
   static const Color error = Color(0xFFF44336); // Red for alerts
   static const Color success = Color(0xFF4CAF50); // Green for success messages
 }
-
