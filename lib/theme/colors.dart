@@ -29,3 +29,4 @@ class AppColors {
   static const Color error = Color(0xFFF44336); // Red for alerts
   static const Color success = Color(0xFF4CAF50); // Green for success messages
 }
+
