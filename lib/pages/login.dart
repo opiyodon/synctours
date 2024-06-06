@@ -11,10 +11,12 @@ class Login extends StatelessWidget {
         backgroundColor: AppColors.primary,
         title: const Text(
           'Login',
-          style: TextStyle(color: Colors.white), // Text color set to white
+          style:
+              TextStyle(color: AppColors.buttonText), // Text color set to white
         ),
         elevation: 0.0,
-        iconTheme: const IconThemeData(color: Colors.white), // Back arrow color set to white
+        iconTheme: const IconThemeData(
+            color: AppColors.buttonText), // Back arrow color set to white
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -25,90 +27,140 @@ class Login extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/icon/logo.png',
-                width: 180.0,
-                height: 180.0,
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: const BoxDecoration(
+                  color: AppColors.background,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.all(Radius.circular(25)),
+                ),
+                child: Image.asset(
+                  'assets/icon/icon.png',
+                  width: 100.0,
+                  height: 100.0,
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 50),
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Enter email or phone number',
-                  hintStyle: const TextStyle(color: Colors.white),
+                  hintText: 'Enter your username',
+                  hintStyle: const TextStyle(color: AppColors.buttonText),
                   filled: true,
-                  fillColor: Colors.white24,
+                  fillColor: AppColors.authInput,
+                  contentPadding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(30.0),
                     borderSide: BorderSide.none,
                   ),
                 ),
+                style: const TextStyle(color: AppColors.authInputText),
               ),
               const SizedBox(height: 16),
               TextField(
                 obscureText: true,
                 decoration: InputDecoration(
-                  hintText: 'Password',
-                  hintStyle: const TextStyle(color: Colors.white),
+                  hintText: 'Enter your password',
+                  hintStyle: const TextStyle(color: AppColors.buttonText),
                   filled: true,
-                  fillColor: Colors.white24,
+                  fillColor: AppColors.authInput,
+                  contentPadding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(30.0),
                     borderSide: BorderSide.none,
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Icon(
-                Icons.check_circle,
-                color: Colors.white,
-                size: 16,
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Remember me',
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: AppColors.authInputText),
               ),
               const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(color: Color(0xFF9B51E0)),
+              ElevatedButton(
+                onPressed: () {
+                  // Functionality for login
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors
+                      .accent, // Using brown accent for button background
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 130.0, vertical: 10.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                "Don't have an account?",
-                style: TextStyle(color: Colors.white),
-              ),
-              TextButton(
-                onPressed: () {},
                 child: const Text(
-                  'Register here!',
-                  style: TextStyle(color: Colors.white),
+                  'Log In',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    color:
+                        AppColors.buttonText, // Using white color for contrast
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
-              const Row(
+              const SizedBox(height: 16),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.facebook, color: Colors.white),
-                  SizedBox(width: 16),
-                  Icon(Icons.circle_outlined, color: Colors.white),
-                  SizedBox(width: 16),
-                  Icon(Icons.g_mobiledata, color: Colors.white),
+                  const Text(
+                    "Don't have an account?",
+                    style: TextStyle(color: AppColors.buttonText),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // Navigate to the sign-up page
+                      Navigator.pushNamed(context, '/sign_up');
+                    },
+                    child: const Text(
+                      'Sign Up here!',
+                      style: TextStyle(color: AppColors.accent),
+                    ),
+                  ),
                 ],
               ),
+              const SizedBox(height: 40),
+              const Text(
+                "-------------   or log in with   -------------",
+                style: TextStyle(color: AppColors.buttonText),
+              ),
+              const SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(1), // Adjust padding as needed
+                    decoration: const BoxDecoration(
+                      color: AppColors.authInput,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Image.asset(
+                          'assets/icon/google.png',
+                          width: 50.0,
+                          height: 50.0,
+                      ),
+                      onPressed: () {
+                        // Handle Google button tap
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Container(
+                    padding: const EdgeInsets.all(6), // Adjust padding as needed
+                    decoration: const BoxDecoration(
+                      color: AppColors.authInput,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Image.asset(
+                          'assets/icon/apple.png',
+                          width: 35.0,
+                          height: 35.0
+                      ),
+                      onPressed: () {
+                        // Handle Apple button tap
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 35),
             ],
           ),
         ),

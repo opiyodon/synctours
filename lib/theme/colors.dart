@@ -29,6 +29,10 @@ class AppColors {
   static const Color textFieldBorder = Color(0xFFD1C4E9); // Light Purple for subtlety
   static const Color divider = Color(0xFFD1C4E9); // Light Purple for separation
 
+  // login and sign_up form inputs
+  static const Color authInput = Colors.white24;
+  static const Color authInputText = Colors.white;
+
   // Alerts and Messages
   static const Color error = Color(0xFFE57373); // Soft Red for alerts
   static const Color success = Color(0xFF81C784); // Soft Green for success message
