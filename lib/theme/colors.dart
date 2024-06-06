@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Main Theme Colors
+  static const Color primary = Color(0xFFE15D5E); // Deep Purple for happiness
   static const Color secondary = Color(0xFF8E44AD); // Deep Purple for happiness
   static const Color accent = Color(0xFFFF7043); // Warm Coral for energy
   static const Color background = Color(0xFFFFCCBC); // Light Peach for warmth
