@@ -44,13 +44,16 @@ class Login extends StatelessWidget {
               ),
               child: const Text(
                 'Login',
-                style: TextStyle(fontSize: 18.0),
+                style: TextStyle(
+                  color: Color.fromARGB(255, 46, 2, 65),
+                  fontSize: 18.0
+                ),
               ),
             ),
             const SizedBox(height: 20.0),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/signup');
+                Navigator.pushNamed(context, '/sign_up');
               },
               child: const Text(
                 'Don\'t have an account? Register here!',
