@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:synctours/theme/colors.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   const Login({super.key});
+
+  @override
+  LoginState createState() => LoginState();
+}
+
+class LoginState extends State<Login> {
+  bool isHidden = true;
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,12 +25,12 @@ class Login extends StatelessWidget {
         backgroundColor: AppColors.primary,
         title: const Text(
           'Login',
-          style:
-              TextStyle(color: AppColors.buttonText), // Text color set to white
+          style: TextStyle(color: AppColors.buttonText),
         ),
         elevation: 0.0,
         iconTheme: const IconThemeData(
-            color: AppColors.buttonText), // Back arrow color set to white
+          color: AppColors.buttonText,
+        ),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -57,7 +71,8 @@ class Login extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               TextField(
-                obscureText: true,
+                controller: passwordController,
+                obscureText: isHidden,
                 decoration: InputDecoration(
                   hintText: 'Enter your password',
                   hintStyle: const TextStyle(color: AppColors.buttonText),
@@ -68,6 +83,17 @@ class Login extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30.0),
                     borderSide: BorderSide.none,
                   ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      isHidden ? Icons.visibility_off : Icons.visibility,
+                      color: AppColors.buttonText,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isHidden = !isHidden;
+                      });
+                    },
+                  ),
                 ),
                 style: const TextStyle(color: AppColors.authInputText),
               ),
@@ -77,8 +103,7 @@ class Login extends StatelessWidget {
                   // Functionality for login
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors
-                      .accent, // Using brown accent for button background
+                  backgroundColor: AppColors.accent,
                   padding: const EdgeInsets.symmetric(
                       horizontal: 130.0, vertical: 10.0),
                   shape: RoundedRectangleBorder(
@@ -89,8 +114,7 @@ class Login extends StatelessWidget {
                   'Log In',
                   style: TextStyle(
                     fontSize: 18.0,
-                    color:
-                        AppColors.buttonText, // Using white color for contrast
+                    color: AppColors.buttonText,
                   ),
                 ),
               ),
@@ -108,7 +132,7 @@ class Login extends StatelessWidget {
                       Navigator.pushNamed(context, '/sign_up');
                     },
                     child: const Text(
-                      'Sign Up here!',
+                      'Register here!',
                       style: TextStyle(color: AppColors.accent),
                     ),
                   ),
@@ -124,16 +148,16 @@ class Login extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(1), // Adjust padding as needed
+                    padding: const EdgeInsets.all(1),
                     decoration: const BoxDecoration(
                       color: AppColors.authInput,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: Image.asset(
-                          'assets/icon/google.png',
-                          width: 50.0,
-                          height: 50.0,
+                        'assets/icon/google.png',
+                        width: 50.0,
+                        height: 50.0,
                       ),
                       onPressed: () {
                         // Handle Google button tap
@@ -142,16 +166,16 @@ class Login extends StatelessWidget {
                   ),
                   const SizedBox(width: 15),
                   Container(
-                    padding: const EdgeInsets.all(6), // Adjust padding as needed
+                    padding: const EdgeInsets.all(6),
                     decoration: const BoxDecoration(
                       color: AppColors.authInput,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: Image.asset(
-                          'assets/icon/apple.png',
-                          width: 35.0,
-                          height: 35.0
+                        'assets/icon/apple.png',
+                        width: 35.0,
+                        height: 35.0,
                       ),
                       onPressed: () {
                         // Handle Apple button tap
