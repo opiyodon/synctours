@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:synctours/theme/colors.dart'; // Assuming you have a custom color file
+import 'package:synctours/theme/colors.dart';
 
 class Authentication extends StatelessWidget {
   const Authentication({super.key});
@@ -19,7 +19,7 @@ class Authentication extends StatelessWidget {
               children: <Widget>[
                 Image.asset(
                   'assets/icon/logo.png',
-                  width: 150.0, // Adjust size as needed
+                  width: 150.0,
                   height: 150.0,
                 ),
                 const SizedBox(height: 40.0),
@@ -28,7 +28,7 @@ class Authentication extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16.0,
-                    color: AppColors.buttonText, // Using white color for contrast
+                    color: AppColors.buttonText,
                   ),
                 ),
                 const SizedBox(height: 20.0),
@@ -38,10 +38,11 @@ class Authentication extends StatelessWidget {
                     Navigator.pushNamed(context, '/login');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors
-                        .accent, // Using brown accent for button background
+                    backgroundColor: AppColors.accent,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 130.0, vertical: 10.0),
+                      horizontal: 130.0,
+                      vertical: 10.0,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
@@ -50,8 +51,7 @@ class Authentication extends StatelessWidget {
                     'Log In',
                     style: TextStyle(
                       fontSize: 18.0,
-                      color:
-                          AppColors.buttonText, // Using white color for contrast
+                      color: AppColors.buttonText,
                     ),
                   ),
                 ),
@@ -64,17 +64,21 @@ class Authentication extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 130.0, vertical: 10.0),
+                      horizontal: 130.0,
+                      vertical: 10.0,
+                    ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          30.0), // Using warm red as border color
+                      borderRadius: BorderRadius.circular(30.0),
+                      side: const BorderSide(
+                        color: AppColors.accent,
+                      ),
                     ),
                   ),
                   child: const Text(
                     'Sign Up',
                     style: TextStyle(
                       fontSize: 18.0,
-                      color: AppColors.accent, // Using warm red as text color
+                      color: AppColors.accent,
                     ),
                   ),
                 ),
