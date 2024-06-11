@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Main Theme Colors
+  static const Color primary = Color(0xFFE15D5E); // Deep Purple for happiness
   static const Color secondary = Color(0xFF8E44AD); // Deep Purple for happiness
   static const Color accent = Color(0xFFFF7043); // Warm Coral for energy
   static const Color background = Color(0xFFFFCCBC); // Light Peach for warmth
@@ -27,6 +28,10 @@ class AppColors {
   static const Color secondaryText = Color(0xFF757575); // Grey for less emphasis
   static const Color textFieldBorder = Color(0xFFD1C4E9); // Light Purple for subtlety
   static const Color divider = Color(0xFFD1C4E9); // Light Purple for separation
+
+  // login and sign_up form inputs
+  static const Color authInput = Colors.white24;
+  static const Color authInputText = Colors.white;
 
   // Alerts and Messages
   static const Color error = Color(0xFFE57373); // Soft Red for alerts
