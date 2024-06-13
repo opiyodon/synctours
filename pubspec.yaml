@@ -88,6 +88,13 @@ flutter:
     - assets/icon/logo.png
     - assets/icon/google.png
     - assets/icon/apple.png
+    - assets/eland.jpg
+    - assets/lake_nakuru.jpg
+    - assets/mombasa-skyline.jpg
+    - assets/beach.jpg
+    - assets/mombasa.jpeg
+    - assets/nairobi.jpeg
+    - assets/wild.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

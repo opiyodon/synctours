@@ -19,7 +19,7 @@ void main() {
       '/authentication': (context) => const Authentication(),
       '/login': (context) => const Login(),
       '/sign_up': (context) => const SignUp(),
-      '/home': (context) => const Home(),
+      '/home': (context) =>  Home(),
       '/find_current_location': (context) => const FindCurrentLocation(),
       '/locate_in_map': (context) => const LocateInMap(),
       '/video_search': (context) => const VideoSearch(),
