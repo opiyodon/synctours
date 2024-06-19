@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:synctours/widgets/brand_name.dart';
+import 'package:synctours/shared/brand_name.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
