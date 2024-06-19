@@ -48,7 +48,7 @@ class Authentication extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'Log In',
+                    'Login',
                     style: TextStyle(
                       fontSize: 18.0,
                       color: AppColors.buttonText,
@@ -59,7 +59,7 @@ class Authentication extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Navigate to the sign-up page
-                    Navigator.pushNamed(context, '/sign_up');
+                    Navigator.pushNamed(context, '/register');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -75,7 +75,7 @@ class Authentication extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'Sign Up',
+                    'Register',
                     style: TextStyle(
                       fontSize: 18.0,
                       color: AppColors.accent,
