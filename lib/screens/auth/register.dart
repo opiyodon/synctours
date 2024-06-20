@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:synctours/theme/colors.dart';
 
-class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+class Register extends StatefulWidget {
+  const Register({super.key});
 
   @override
-  SignUpState createState() => SignUpState();
+  RegisterState createState() => RegisterState();
 }
 
-class SignUpState extends State<SignUp> {
+class RegisterState extends State<Register> {
   bool isPasswordHidden = true;
   bool isConfirmPasswordHidden = true;
   final TextEditingController fullNameController = TextEditingController();
@@ -51,7 +51,7 @@ class SignUpState extends State<SignUp> {
         appBar: AppBar(
           backgroundColor: AppColors.primary,
           title: const Text(
-            'Sign Up',
+            'Register',
             style: TextStyle(color: AppColors.buttonText),
           ),
           elevation: 0.0,
@@ -80,23 +80,24 @@ class SignUpState extends State<SignUp> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Spacer(),
                             Container(
                               padding: const EdgeInsets.all(15),
                               decoration: const BoxDecoration(
                                 color: AppColors.background,
                                 shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.all(Radius.circular(25)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(25)),
                               ),
                               child: Image.asset(
                                 'assets/icon/icon.png',
-                                width: 100.0,
-                                height: 100.0,
+                                width: 70.0,
+                                height: 70.0,
                               ),
                             ),
-                            const SizedBox(height: 35),
+                            const SizedBox(height: 15),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
                               child: Column(
                                 children: [
                                   TextFormField(
@@ -107,14 +108,15 @@ class SignUpState extends State<SignUp> {
                                           color: AppColors.buttonText),
                                       filled: true,
                                       fillColor: AppColors.authInput,
-                                      contentPadding:
-                                          const EdgeInsets.fromLTRB(40, 15, 40, 15),
+                                      contentPadding: const EdgeInsets.fromLTRB(
+                                          40, 15, 40, 15),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
                                         borderSide: BorderSide.none,
                                       ),
-                                      errorStyle:
-                                          const TextStyle(color: AppColors.error),
+                                      errorStyle: const TextStyle(
+                                          color: AppColors.error),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -125,7 +127,7 @@ class SignUpState extends State<SignUp> {
                                     style: const TextStyle(
                                         color: AppColors.authInputText),
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 15),
                                   TextFormField(
                                     controller: usernameController,
                                     decoration: InputDecoration(
@@ -134,14 +136,15 @@ class SignUpState extends State<SignUp> {
                                           color: AppColors.buttonText),
                                       filled: true,
                                       fillColor: AppColors.authInput,
-                                      contentPadding:
-                                          const EdgeInsets.fromLTRB(40, 15, 40, 15),
+                                      contentPadding: const EdgeInsets.fromLTRB(
+                                          40, 15, 40, 15),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
                                         borderSide: BorderSide.none,
                                       ),
-                                      errorStyle:
-                                          const TextStyle(color: AppColors.error),
+                                      errorStyle: const TextStyle(
+                                          color: AppColors.error),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -152,7 +155,7 @@ class SignUpState extends State<SignUp> {
                                     style: const TextStyle(
                                         color: AppColors.authInputText),
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 15),
                                   TextFormField(
                                     controller: emailController,
                                     decoration: InputDecoration(
@@ -161,14 +164,15 @@ class SignUpState extends State<SignUp> {
                                           color: AppColors.buttonText),
                                       filled: true,
                                       fillColor: AppColors.authInput,
-                                      contentPadding:
-                                          const EdgeInsets.fromLTRB(40, 15, 40, 15),
+                                      contentPadding: const EdgeInsets.fromLTRB(
+                                          40, 15, 40, 15),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
                                         borderSide: BorderSide.none,
                                       ),
-                                      errorStyle:
-                                          const TextStyle(color: AppColors.error),
+                                      errorStyle: const TextStyle(
+                                          color: AppColors.error),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -180,7 +184,7 @@ class SignUpState extends State<SignUp> {
                                     style: const TextStyle(
                                         color: AppColors.authInputText),
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 15),
                                   TextFormField(
                                     controller: phoneNumberController,
                                     decoration: InputDecoration(
@@ -189,14 +193,15 @@ class SignUpState extends State<SignUp> {
                                           color: AppColors.buttonText),
                                       filled: true,
                                       fillColor: AppColors.authInput,
-                                      contentPadding:
-                                          const EdgeInsets.fromLTRB(40, 15, 40, 15),
+                                      contentPadding: const EdgeInsets.fromLTRB(
+                                          40, 15, 40, 15),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
                                         borderSide: BorderSide.none,
                                       ),
-                                      errorStyle:
-                                          const TextStyle(color: AppColors.error),
+                                      errorStyle: const TextStyle(
+                                          color: AppColors.error),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -208,7 +213,7 @@ class SignUpState extends State<SignUp> {
                                     style: const TextStyle(
                                         color: AppColors.authInputText),
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 15),
                                   TextFormField(
                                     controller: passwordController,
                                     obscureText: isPasswordHidden,
@@ -218,10 +223,11 @@ class SignUpState extends State<SignUp> {
                                           color: AppColors.buttonText),
                                       filled: true,
                                       fillColor: AppColors.authInput,
-                                      contentPadding:
-                                          const EdgeInsets.fromLTRB(40, 15, 40, 15),
+                                      contentPadding: const EdgeInsets.fromLTRB(
+                                          40, 15, 40, 15),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
                                         borderSide: BorderSide.none,
                                       ),
                                       suffixIcon: IconButton(
@@ -233,12 +239,13 @@ class SignUpState extends State<SignUp> {
                                         ),
                                         onPressed: () {
                                           setState(() {
-                                            isPasswordHidden = !isPasswordHidden;
+                                            isPasswordHidden =
+                                                !isPasswordHidden;
                                           });
                                         },
                                       ),
-                                      errorStyle:
-                                          const TextStyle(color: AppColors.error),
+                                      errorStyle: const TextStyle(
+                                          color: AppColors.error),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -252,7 +259,7 @@ class SignUpState extends State<SignUp> {
                                     style: const TextStyle(
                                         color: AppColors.authInputText),
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 15),
                                   TextFormField(
                                     controller: confirmPasswordController,
                                     obscureText: isConfirmPasswordHidden,
@@ -262,10 +269,11 @@ class SignUpState extends State<SignUp> {
                                           color: AppColors.buttonText),
                                       filled: true,
                                       fillColor: AppColors.authInput,
-                                      contentPadding:
-                                          const EdgeInsets.fromLTRB(40, 15, 40, 15),
+                                      contentPadding: const EdgeInsets.fromLTRB(
+                                          40, 15, 40, 15),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
                                         borderSide: BorderSide.none,
                                       ),
                                       suffixIcon: IconButton(
@@ -282,8 +290,8 @@ class SignUpState extends State<SignUp> {
                                           });
                                         },
                                       ),
-                                      errorStyle:
-                                          const TextStyle(color: AppColors.error),
+                                      errorStyle: const TextStyle(
+                                          color: AppColors.error),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -305,11 +313,12 @@ class SignUpState extends State<SignUp> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 130.0, vertical: 10.0),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
                                       ),
                                     ),
                                     child: const Text(
-                                      'Sign Up',
+                                      'Register',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
@@ -323,63 +332,19 @@ class SignUpState extends State<SignUp> {
                                     children: [
                                       const Text(
                                         "Already have an account?",
-                                        style:
-                                            TextStyle(color: AppColors.buttonText),
+                                        style: TextStyle(
+                                            color: AppColors.buttonText),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           // Navigate to the sign-up page
-                                          Navigator.pushNamed(context, '/login');
+                                          Navigator.pushNamed(
+                                              context, '/login');
                                         },
                                         child: const Text(
                                           'Login here!',
-                                          style: TextStyle(color: AppColors.accent),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 40),
-                                  const Text(
-                                    "-------------   or sign up with   -------------",
-                                    style: TextStyle(color: AppColors.buttonText),
-                                  ),
-                                  const SizedBox(height: 40),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(1),
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.authInput,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: IconButton(
-                                          icon: Image.asset(
-                                            'assets/icon/google.png',
-                                            width: 50.0,
-                                            height: 50.0,
-                                          ),
-                                          onPressed: () {
-                                            // Handle Google button tap
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: 15),
-                                      Container(
-                                        padding: const EdgeInsets.all(6),
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.authInput,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: IconButton(
-                                          icon: Image.asset(
-                                            'assets/icon/apple.png',
-                                            width: 35.0,
-                                            height: 35.0,
-                                          ),
-                                          onPressed: () {
-                                            // Handle Apple button tap
-                                          },
+                                          style: TextStyle(
+                                              color: AppColors.accent),
                                         ),
                                       ),
                                     ],

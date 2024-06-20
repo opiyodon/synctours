@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:synctours/theme/colors.dart';
 
 class Loading extends StatelessWidget {
   const Loading({super.key});
@@ -7,11 +8,15 @@ class Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.brown[100],
-      body: const Center(
-        child: SpinKitChasingDots(
-          color: Colors.brown,
-          size: 50.0,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppColors.loadingBackground,
+        ),
+        child: const Center(
+          child: SpinKitChasingDots(
+            color: AppColors.accent,
+            size: 50.0,
+          ),
         ),
       ),
     );
