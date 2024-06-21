@@ -69,9 +69,6 @@ class Authentication extends StatelessWidget {
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
-                      side: const BorderSide(
-                        color: AppColors.accent,
-                      ),
                     ),
                   ),
                   child: const Text(
