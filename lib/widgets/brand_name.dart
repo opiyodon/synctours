@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:synctours/theme/colors.dart';
 
-Widget brandName () {
+Widget brandName() {
   return const Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Text(
-          'Sync',
+        'Sync',
         style: TextStyle(
-          color: Colors.black87,
+          color: AppColors.buttonText,
         ),
       ),
       Text(
-          'Tours',
+        'Tours',
         style: TextStyle(
-          color: Colors.amber,
+          color: AppColors.accent,
         ),
       ),
     ],

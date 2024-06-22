@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:synctours/theme/colors.dart';
 import 'package:synctours/services/auth.dart';
-import 'package:synctours/shared/loading.dart';
 import 'package:synctours/models/user.dart';
+import 'package:synctours/widgets/loading.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
