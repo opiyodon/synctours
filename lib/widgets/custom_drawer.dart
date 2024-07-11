@@ -50,6 +50,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               // Navigate to home
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/home');
             },
           ),
           ListTile(
@@ -58,6 +59,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               // Navigate to weather forecast page
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/find_current_location');
             },
           ),
           ListTile(
@@ -66,6 +68,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               // Navigate to locate in map page
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/locate_in_map');
             },
           ),
           ListTile(
@@ -74,6 +77,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               // Navigate to distance calculator page
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/calculate_distance');
             },
           ),
           ListTile(
@@ -82,6 +86,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               // Navigate to video search page
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/video_search');
             },
           ),
           ListTile(
@@ -90,6 +95,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               // Navigate to weather forecast page
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/weather_forecast');
             },
           ),
         ],

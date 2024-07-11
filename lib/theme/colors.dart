@@ -17,6 +17,16 @@ class AppColors {
     ],
   );
 
+  // Gradient for entire app screens Background
+  static const LinearGradient appBackground = LinearGradient(
+    begin: Alignment.topRight,
+    end: Alignment.bottomLeft,
+    colors: [
+      Color(0xFFF4EFE6),
+      Color(0xFFFFFFFF),
+    ],
+  );
+
   // Navbar, Icons, and Buttons
   static const Color navbarBackground = Color(0xFF8D27A7); // Deep Purple for consistency
   static const Color iconColor = Color(0xFFBA68C8); // Lighter Purple for friendly neutrality

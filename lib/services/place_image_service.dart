@@ -6,6 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:synctours/utils/image_utils.dart';
 
 class PlaceImageService {
+  static final String geopifyApiKey = dotenv.env['GEOAPIFY_API_KEY']!;
+  static const String geopifyApiUrl =
+      'https://api.geoapify.com/v1/geocode/search';
   static final String mapboxApiKey = dotenv.env['MAPBOX_API_KEY']!;
   static const String mapboxApiUrl =
       'https://api.mapbox.com/geocoding/v5/mapbox.places';
@@ -13,9 +16,11 @@ class PlaceImageService {
   static const String unsplashApiUrl = 'https://api.unsplash.com/search/photos';
 
   static DateTime _lastRequestTime = DateTime.now();
-  static const int _maxRequestsPerDay = 5000;
+  static const int _maxRequestsPerDay = 3000;
   static const String _lastRequestDateKey = 'lastRequestDate';
   static const String _requestCountKey = 'requestCount';
+  static const String _cacheKey = 'placeCache';
+  static const Duration _cacheExpiration = Duration(days: 1);
 
   static Future<void> _enforceRateLimit() async {
     final now = DateTime.now();
@@ -52,24 +57,51 @@ class PlaceImageService {
     if (await _canMakeRequest()) {
       await _enforceRateLimit();
 
-      final response = await http.get(
+      final geoapifyResponse = await http.get(
+        Uri.parse(
+            '$geopifyApiUrl?text=$query&apiKey=$geopifyApiKey&country=KE'),
+      );
+
+      final mapboxResponse = await http.get(
         Uri.parse(
             '$mapboxApiUrl/$query.json?access_token=$mapboxApiKey&country=KE'),
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body)['features'];
-        if (data.isNotEmpty) {
-          final place = data[0]['place_name'];
-          final coordinates = data[0]['center'];
-          return {
-            'name': place,
-            'lat': coordinates[1],
-            'lon': coordinates[0],
-            'formatted': place,
-            'categories':
-                [], // Mapbox doesn't provide categories in geocoding API
+      final unsplashResponse = await http.get(
+        Uri.parse(
+            '$unsplashApiUrl?query=$query&client_id=$unsplashApiKey&per_page=5'),
+      );
+
+      if (geoapifyResponse.statusCode == 200 &&
+          mapboxResponse.statusCode == 200 &&
+          unsplashResponse.statusCode == 200) {
+        final geoapifyData = json.decode(geoapifyResponse.body)['features'];
+        final mapboxData = json.decode(mapboxResponse.body)['features'];
+        final unsplashData = json.decode(unsplashResponse.body)['results'];
+
+        if (geoapifyData.isNotEmpty && mapboxData.isNotEmpty) {
+          final geoapifyPlace = geoapifyData[0]['properties'];
+          final mapboxPlace = mapboxData[0];
+
+          final placeDetails = {
+            'name':
+                geoapifyPlace['name'] ?? mapboxPlace['place_name'] ?? 'Unknown',
+            'lat': geoapifyPlace['lat'] ?? mapboxPlace['center'][1],
+            'lon': geoapifyPlace['lon'] ?? mapboxPlace['center'][0],
+            'formatted':
+                geoapifyPlace['formatted'] ?? mapboxPlace['place_name'],
+            'categories': geoapifyPlace['categories'] ??
+                mapboxPlace['context'].map((item) => item['id']).toList(),
+            'country': geoapifyPlace['country'] ?? 'Kenya',
+            'state': geoapifyPlace['state'] ?? '',
+            'city': geoapifyPlace['city'] ?? '',
+            'postcode': geoapifyPlace['postcode'] ?? '',
+            'description': mapboxPlace['text'] ?? '',
+            'images':
+                unsplashData.map((image) => image['urls']['regular']).toList(),
           };
+
+          return placeDetails;
         } else {
           throw Exception('No results found for the query');
         }
@@ -77,7 +109,6 @@ class PlaceImageService {
         throw Exception('Failed to load place details');
       }
     } else {
-      // Calculate when the user can try again
       final prefs = await SharedPreferences.getInstance();
       final lastRequestDate = prefs.getString(_lastRequestDateKey);
       final now = DateTime.now();
@@ -99,48 +130,42 @@ class PlaceImageService {
     }
   }
 
-  static Future<String> fetchImageUrl(String query) async {
-    final response = await http.get(
-        Uri.parse('$unsplashApiUrl?query=$query&client_id=$unsplashApiKey'));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data['results'][0]['urls']['regular'];
-    } else {
-      throw Exception('Failed to load image');
-    }
-  }
-
   static Future<List<Map<String, dynamic>>> fetchAllPlaces() async {
-    List<String> places = getDestinationNames();
-    List<Map<String, dynamic>> placeDetailsList = [];
+    List<String> allPlaces = getDestinationNames();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, dynamic> cache =
+        json.decode(prefs.getString(_cacheKey) ?? '{}');
 
-    for (String place in places) {
-      try {
-        final details = await fetchPlaceDetails(place);
-        final imageUrl = await fetchImageUrl(place);
-        placeDetailsList.add({
-          ...details,
-          'imageUrl': imageUrl,
-        });
-      } catch (e) {
-        print("Error fetching place: $place, $e");
+    List<Future<Map<String, dynamic>>> futures = [];
+
+    for (String place in allPlaces) {
+      if (cache.containsKey(place) &&
+          DateTime.now().difference(DateTime.parse(cache[place]['timestamp'])) <
+              _cacheExpiration) {
+        futures.add(Future.value(cache[place]['data']));
+      } else {
+        futures.add(fetchPlaceDetails(place).then((details) {
+          cache[place] = {
+            'data': details,
+            'timestamp': DateTime.now().toIso8601String(),
+          };
+          prefs.setString(_cacheKey, json.encode(cache));
+          return details;
+        }).catchError((e) {
+          print("Error fetching place: $place, $e");
+          return <String, dynamic>{};
+        }));
       }
     }
 
-    return placeDetailsList;
+    List<Map<String, dynamic>> placeDetailsList = await Future.wait(futures);
+    return placeDetailsList.where((place) => place.isNotEmpty).toList();
   }
 
   static Future<List<Map<String, dynamic>>> searchPlaces(String query) async {
     try {
       final details = await fetchPlaceDetails(query);
-      final imageUrl = await fetchImageUrl(query);
-      return [
-        {
-          ...details,
-          'imageUrl': imageUrl,
-        }
-      ];
+      return [details];
     } catch (e) {
       print("Error searching places: $e");
       return [];

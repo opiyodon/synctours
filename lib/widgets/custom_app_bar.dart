@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:synctours/screens/user/profile.dart';
 import 'package:synctours/theme/colors.dart';
 import 'package:synctours/widgets/brand_name.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppBar({super.key});
+  final String title;
+
+  const CustomAppBar({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             },
           ),
           const SizedBox(width: 8.0),
-          brandName(),
+          brandName(title),
         ],
       ),
       backgroundColor: AppColors.primary,
@@ -30,6 +33,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: AppColors.buttonText,
           onPressed: () {
             // Open profile page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Profile()),
+            );
           },
         ),
       ],

@@ -22,23 +22,34 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(StreamProvider<CustomUser?>.value(
-    value: AuthService().user,
-    initialData: null,
-    child: MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const Wrapper(),
-      routes: {
-        '/authentication': (context) => const Authentication(),
-        '/login': (context) => const Login(),
-        '/register': (context) => const Register(),
-        '/home': (context) => const Home(),
-        '/find_current_location': (context) => const FindCurrentLocation(),
-        '/locate_in_map': (context) => const LocateInMap(),
-        '/video_search': (context) => const VideoSearch(),
-        '/weather_forecast': (context) => const WeatherForecast(),
-        '/calculate_distance': (context) => const CalculateDistance(),
-      },
-    ),
-  ));
+
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamProvider<CustomUser?>.value(
+      value: AuthService().user,
+      initialData: null,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const Wrapper(),
+        routes: {
+          '/authentication': (context) => const Authentication(),
+          '/login': (context) => const Login(),
+          '/register': (context) => const Register(),
+          '/home': (context) => const Home(),
+          '/find_current_location': (context) => const FindCurrentLocation(),
+          '/locate_in_map': (context) => const LocateInMap(location: ''),
+          '/video_search': (context) => const VideoSearch(location: ''),
+          '/weather_forecast': (context) => const WeatherForecast(location: ''),
+          '/calculate_distance': (context) =>
+              const CalculateDistance(location: ''),
+        },
+      ),
+    );
+  }
 }
