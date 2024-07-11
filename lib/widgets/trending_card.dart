@@ -21,12 +21,11 @@ class TrendingCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PlaceDetails(placeDetails: placeDetails),
+            builder: (context) => PlaceDetails(place: placeDetails),
           ),
         );
       },
-      child: Container(
-        margin: const EdgeInsets.only(right: 16.0),
+      child: SizedBox(
         width: 120.0,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12.0),
@@ -37,7 +36,7 @@ class TrendingCard extends StatelessWidget {
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
                 placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator()),
+                const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
               Align(
@@ -50,8 +49,11 @@ class TrendingCard extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),

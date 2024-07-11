@@ -27,6 +27,8 @@ if (flutterVersionName == null) {
 }
 
 android {
+    compileSdkVersion 34
+
     namespace = "com.example.synctours"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
@@ -42,9 +44,18 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 23
-        targetSdk = flutter.targetSdkVersion
+        targetSdkVersion 34
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    dependencies {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+        // Other dependencies
     }
 
     buildTypes {

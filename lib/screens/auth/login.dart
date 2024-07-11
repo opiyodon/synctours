@@ -27,6 +27,9 @@ class LoginState extends State<Login> {
   }
 
   void _login() async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
     if (_formKey.currentState!.validate()) {
       setState(() => loading = true);
 
@@ -43,11 +46,11 @@ class LoginState extends State<Login> {
           );
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           const SnackBar(content: Text('Login successful')),
         );
         // Navigate to home screen or do something else
-        Navigator.pushReplacementNamed(context, '/home');
+        navigator.pushReplacementNamed('/home');
       }
     }
   }
