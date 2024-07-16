@@ -67,6 +67,7 @@ dependencies:
   latlong2: ^0.9.1
   geocoding: ^3.0.0
   flutter_map_cache: ^1.5.1
+  crypto: ^3.0.3
 
 flutter_launcher_icons:
   android: true

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:synctours/theme/colors.dart';
 import 'package:synctours/services/auth.dart';
-import 'package:synctours/shared/loading.dart';
 import 'package:synctours/models/user.dart';
+import 'package:synctours/widgets/loading.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -19,14 +19,21 @@ class LoginState extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool loading = false;
 
+  // Add a FocusNode for the password field
+  final FocusNode _passwordFocusNode = FocusNode();
+
   @override
   void dispose() {
     passwordController.dispose();
     emailController.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
   void _login() async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
     if (_formKey.currentState!.validate()) {
       setState(() => loading = true);
 
@@ -43,11 +50,11 @@ class LoginState extends State<Login> {
           );
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           const SnackBar(content: Text('Login successful')),
         );
         // Navigate to home screen or do something else
-        Navigator.pushReplacementNamed(context, '/home');
+        navigator.pushReplacementNamed('/home');
       }
     }
   }
@@ -148,10 +155,17 @@ class LoginState extends State<Login> {
                                             },
                                             style: const TextStyle(
                                                 color: AppColors.authInputText),
+                                            // Move focus to password field when Enter is pressed
+                                            onFieldSubmitted: (_) {
+                                              FocusScope.of(context)
+                                                  .requestFocus(
+                                                      _passwordFocusNode);
+                                            },
                                           ),
                                           const SizedBox(height: 16),
                                           TextFormField(
                                             controller: passwordController,
+                                            focusNode: _passwordFocusNode,
                                             obscureText: isHidden,
                                             decoration: InputDecoration(
                                               hintText: 'Enter your password',
@@ -192,6 +206,8 @@ class LoginState extends State<Login> {
                                             },
                                             style: const TextStyle(
                                                 color: AppColors.authInputText),
+                                            // Submit the form when Enter is pressed in the password field
+                                            onFieldSubmitted: (_) => _login(),
                                           ),
                                           const SizedBox(height: 24),
                                           ElevatedButton(
