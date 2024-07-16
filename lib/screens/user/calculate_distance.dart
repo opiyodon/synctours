@@ -63,9 +63,9 @@ class CalculateDistanceState extends State<CalculateDistance> {
 
     try {
       List<Location> startLocations =
-      await locationFromAddress(startController.text);
+          await locationFromAddress(startController.text);
       List<Location> endLocations =
-      await locationFromAddress(destinationController.text);
+          await locationFromAddress(destinationController.text);
 
       if (startLocations.isNotEmpty && endLocations.isNotEmpty) {
         double distanceInMeters = Geolocator.distanceBetween(
@@ -100,7 +100,10 @@ class CalculateDistanceState extends State<CalculateDistance> {
     return Builder(
       builder: (BuildContext context) {
         return Scaffold(
-          appBar: const CustomAppBar(title: 'Distance Calculator'),
+          appBar: const CustomAppBar(
+            title: 'Distance Calculator',
+            actions: [],
+          ),
           drawer: const CustomDrawer(),
           body: Stack(
             children: [
@@ -211,6 +214,50 @@ class CalculateDistanceState extends State<CalculateDistance> {
           ),
         );
       },
+    );
+  }
+}
+
+class ResultItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const ResultItem({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.accent),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

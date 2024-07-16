@@ -102,7 +102,12 @@ class VideoSearchState extends State<VideoSearch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Video Search'),
+
+      appBar: const CustomAppBar(
+        title: 'Video Search',
+        actions: [],
+      ),
+
       drawer: const CustomDrawer(),
       body: RefreshIndicator(
         onRefresh: () => searchVideos(_searchedLocation),

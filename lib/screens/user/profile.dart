@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:synctours/models/user.dart';
+import 'package:synctours/models/favorite_place.dart';
+import 'package:synctours/screens/user/location_detail.dart';
+import 'package:synctours/screens/user/personal_information.dart';
 import 'package:synctours/services/auth.dart';
 import 'package:synctours/services/database.dart';
 import 'package:synctours/theme/colors.dart';
+import 'package:synctours/widgets/loading.dart';
+
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -13,38 +19,8 @@ class Profile extends StatefulWidget {
 }
 
 class ProfileState extends State<Profile> {
-  final AuthService _auth = AuthService();
-  bool isEditingName = false;
-  late TextEditingController _nameController;
 
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  void _toggleEditName() {
-    setState(() {
-      isEditingName = !isEditingName;
-    });
-  }
-
-  void _editProfile(String uid) async {
-    if (isEditingName) {
-      await DatabaseService(uid: uid).updateUserData(
-        _nameController.text,
-        '', // Keeping username and phone number unchanged
-        '',
-      );
-      _toggleEditName();
-    }
-  }
+  bool _isLoggingOut = false;
 
   void _navigateTo(BuildContext context, Widget page) {
     Navigator.push(
@@ -53,23 +29,70 @@ class ProfileState extends State<Profile> {
     );
   }
 
+  Future<void> _logout() async {
+    if (_isLoggingOut) return;
+
+    setState(() {
+      _isLoggingOut = true;
+    });
+
+    try {
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+
+      AuthService authService = AuthService();
+      await authService.signOut();
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', false);
+    } catch (e) {
+      debugPrint('Error during logout: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoggingOut = false;
+        });
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<CustomUser?>(context);
 
+    if (user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+      });
+      return const Scaffold(body: Center(child: Loading()));
+    }
+
+    if (_isLoggingOut) {
+      return const Scaffold(
+        body: Center(
+          child: Loading(),
+        ),
+      );
+    }
+
     return StreamBuilder<UserData>(
-      stream: DatabaseService(uid: user!.uid!).userData,
+      stream: DatabaseService(uid: user.uid!).userData,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           UserData userData = snapshot.data!;
-          _nameController.text = userData.fullname;
 
           return Scaffold(
             appBar: AppBar(
-              title: const Text('Profile'),
-              centerTitle: true,
+              title: const Text(
+                'Profile',
+                style: TextStyle(color: AppColors.buttonText),
+              ),
               backgroundColor: AppColors.primary,
-              elevation: 0,
+              elevation: 0.0,
+              iconTheme: const IconThemeData(
+                color: AppColors.buttonText,
+              ),
+
             ),
             body: SingleChildScrollView(
               child: Padding(
@@ -90,41 +113,22 @@ class ProfileState extends State<Profile> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (isEditingName)
-                                Expanded(
-                                  child: TextField(
-                                    controller: _nameController,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                )
-                              else
-                                Text(
-                                  userData.fullname,
-                                  style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              IconButton(
-                                icon: Icon(
-                                    isEditingName ? Icons.check : Icons.edit),
-                                color: AppColors.primary,
-                                onPressed: () {
-                                  if (isEditingName) {
-                                    _editProfile(user.uid!);
-                                  } else {
-                                    _toggleEditName();
-                                  }
-                                },
+
+                              Text(
+                                userData.fullname,
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
+                          const SizedBox(height: 5),
                           Text(
-                            'Username: ${userData.username}',
+                            '@${userData.username}',
                             style: TextStyle(
-                                fontSize: 16, color: Colors.grey[600]),
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+
                           ),
                         ],
                       ),
@@ -134,54 +138,63 @@ class ProfileState extends State<Profile> {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
-                    buildListTile(Icons.person, 'Personal information', context,
-                        () => PersonalInformationPage(userData: userData)),
-                    buildListTile(Icons.lock, 'Privacy and sharing', context,
-                        () => const PrivacyAndSharingPage()),
+
+                    buildListTile(
+                        Icons.person,
+                        'Personal information',
+                        context,
+                        () => PersonalInformation(
+                            userData: userData, uid: user.uid!)),
                     const SizedBox(height: 30),
                     const Text('Favorite locations',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
-                    buildListTile(
-                        Icons.star,
-                        'Nakuru',
-                        context,
-                        () => const LocationDetailPage(
-                            'Nakuru', 'Added on June 2024')),
-                    buildListTile(
-                        Icons.star,
-                        'Mombasa',
-                        context,
-                        () => const LocationDetailPage(
-                            'Mombasa', 'Added on June 2024')),
-                    const SizedBox(height: 30),
-                    const Text('Travel history',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    buildListTile(Icons.flight, 'Malindi', context,
-                        () => const TravelHistoryPage('Malindi', 'June 2024')),
-                    buildListTile(Icons.flight, 'Nairobi', context,
-                        () => const TravelHistoryPage('Nairobi', 'June 2024')),
+                    StreamBuilder<List<FavoritePlace>>(
+                      stream: DatabaseService(uid: user.uid!).favoritePlaces,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          List<FavoritePlace> favoritePlaces = snapshot.data!;
+                          return Column(
+                            children: favoritePlaces.take(5).map((place) {
+                              return buildListTile(
+                                Icons.star,
+                                place.name,
+                                context,
+                                () => LocationDetail(
+                                  name: place.name,
+                                  formatted: place.formatted,
+                                  placeId: place.id,
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
                     const SizedBox(height: 30),
                     Center(
                       child: ElevatedButton(
-                        onPressed: () async {
-                          await _auth.signOut();
-                          Navigator.of(context).pushReplacementNamed('/login');
-                        },
+                        onPressed: _logout,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accent,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 130.0, vertical: 10.0),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(30.0),
                           ),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 24.0, vertical: 12.0),
-                          child:
-                              Text('Log out', style: TextStyle(fontSize: 16)),
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: AppColors.buttonText,
+                          ),
+
                         ),
                       ),
                     ),
@@ -192,7 +205,9 @@ class ProfileState extends State<Profile> {
           );
         } else {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+
+            body: Center(child: Loading()),
+
           );
         }
       },
@@ -210,90 +225,3 @@ class ProfileState extends State<Profile> {
   }
 }
 
-class PersonalInformationPage extends StatelessWidget {
-  final UserData userData;
-
-  const PersonalInformationPage({super.key, required this.userData});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Personal Information'),
-        centerTitle: true,
-        backgroundColor: AppColors.primary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Full Name: ${userData.fullname}'),
-            Text('Username: ${userData.username}'),
-            Text('Phone Number: ${userData.phoneNumber}'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PrivacyAndSharingPage extends StatelessWidget {
-  const PrivacyAndSharingPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Privacy and Sharing'),
-        centerTitle: true,
-        backgroundColor: AppColors.primary,
-      ),
-      body: const Center(
-        child: Text('Privacy and Sharing Page'),
-      ),
-    );
-  }
-}
-
-class LocationDetailPage extends StatelessWidget {
-  final String location;
-  final String details;
-
-  const LocationDetailPage(this.location, this.details, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(location),
-        centerTitle: true,
-        backgroundColor: AppColors.primary,
-      ),
-      body: Center(
-        child: Text(details),
-      ),
-    );
-  }
-}
-
-class TravelHistoryPage extends StatelessWidget {
-  final String location;
-  final String date;
-
-  const TravelHistoryPage(this.location, this.date, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(location),
-        centerTitle: true,
-        backgroundColor: AppColors.primary,
-      ),
-      body: Center(
-        child: Text('Travelled on $date'),
-      ),
-    );
-  }
-}

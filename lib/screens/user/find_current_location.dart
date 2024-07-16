@@ -171,7 +171,10 @@ class FindCurrentLocationState extends State<FindCurrentLocation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Current Location'),
+      appBar: const CustomAppBar(
+        title: 'Current Location',
+        actions: [],
+      )
       drawer: const CustomDrawer(),
       body: Stack(
         children: [

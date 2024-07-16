@@ -19,10 +19,14 @@ class LoginState extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool loading = false;
 
+  // Add a FocusNode for the password field
+  final FocusNode _passwordFocusNode = FocusNode();
+
   @override
   void dispose() {
     passwordController.dispose();
     emailController.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -151,10 +155,17 @@ class LoginState extends State<Login> {
                                             },
                                             style: const TextStyle(
                                                 color: AppColors.authInputText),
+                                            // Move focus to password field when Enter is pressed
+                                            onFieldSubmitted: (_) {
+                                              FocusScope.of(context)
+                                                  .requestFocus(
+                                                      _passwordFocusNode);
+                                            },
                                           ),
                                           const SizedBox(height: 16),
                                           TextFormField(
                                             controller: passwordController,
+                                            focusNode: _passwordFocusNode,
                                             obscureText: isHidden,
                                             decoration: InputDecoration(
                                               hintText: 'Enter your password',
@@ -195,6 +206,8 @@ class LoginState extends State<Login> {
                                             },
                                             style: const TextStyle(
                                                 color: AppColors.authInputText),
+                                            // Submit the form when Enter is pressed in the password field
+                                            onFieldSubmitted: (_) => _login(),
                                           ),
                                           const SizedBox(height: 24),
                                           ElevatedButton(

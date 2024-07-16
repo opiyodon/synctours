@@ -26,6 +26,9 @@ class RegisterState extends State<Register> {
   final TextEditingController confirmPasswordController =
   TextEditingController();
 
+  // Add a FocusNode for the last text field
+  final FocusNode _confirmPasswordFocusNode = FocusNode();
+
   @override
   void dispose() {
     fullNameController.dispose();
@@ -34,6 +37,7 @@ class RegisterState extends State<Register> {
     phoneNumberController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    _confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 
@@ -308,6 +312,7 @@ class RegisterState extends State<Register> {
                                     TextFormField(
                                       controller:
                                       confirmPasswordController,
+                                      focusNode: _confirmPasswordFocusNode,
                                       obscureText:
                                       isConfirmPasswordHidden,
                                       decoration: InputDecoration(
@@ -354,6 +359,9 @@ class RegisterState extends State<Register> {
                                       },
                                       style: const TextStyle(
                                           color: AppColors.authInputText),
+
+                                      onFieldSubmitted: (_) => _signUp(),
+
                                     ),
                                     const SizedBox(height: 24),
                                     ElevatedButton(

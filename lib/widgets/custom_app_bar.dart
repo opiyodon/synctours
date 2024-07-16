@@ -6,7 +6,8 @@ import 'package:synctours/widgets/brand_name.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
-  const CustomAppBar({super.key, required this.title});
+  const CustomAppBar(
+      {super.key, required this.title, required List<IconButton> actions});
 
   @override
   Widget build(BuildContext context) {

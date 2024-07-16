@@ -163,7 +163,10 @@ class LocateInMapState extends State<LocateInMap> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Locate in Map'),
+      appBar: const CustomAppBar(
+        title: 'Locate in Map',
+        actions: [],
+      ),
       drawer: const CustomDrawer(),
       body: Stack(
         children: [
