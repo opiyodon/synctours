@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synctours/screens/user/search_results.dart';
+
 import 'package:synctours/theme/colors.dart';
 
 class RecentSearchItem extends StatelessWidget {

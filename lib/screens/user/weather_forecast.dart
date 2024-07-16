@@ -230,10 +230,66 @@ class WeatherForecastState extends State<WeatherForecast> {
                             child: Text(
                                 'Unable to fetch weather data. Please try again.'),
                           ),
+
               ),
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+class InfoCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String imageUrl;
+
+  const InfoCard({
+    super.key,
+    required this.title,
+    required this.value,
+    required this.imageUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Color(0xFF1C160C),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: Color(0xFFA18249),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              imageUrl,
+              width: 80,
+              height: 80,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -386,6 +442,57 @@ class InfoCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class WeatherData {
+  final String location;
+  final double temperature;
+  final double highTemp;
+  final double lowTemp;
+  final double windSpeed;
+  final int humidity;
+  final String description;
+
+  WeatherData({
+    required this.location,
+    required this.temperature,
+    required this.highTemp,
+    required this.lowTemp,
+    required this.windSpeed,
+    required this.humidity,
+    required this.description,
+  });
+
+  factory WeatherData.fromJson(Map<String, dynamic> json) {
+    return WeatherData(
+      location: json['name'],
+      temperature: json['main']['temp'].toDouble(),
+      highTemp: json['main']['temp_max'].toDouble(),
+      lowTemp: json['main']['temp_min'].toDouble(),
+      windSpeed: json['wind']['speed'].toDouble(),
+      humidity: json['main']['humidity'].toInt(),
+      description: json['weather'][0]['main'],
+    );
+  }
+}
+
+class ForecastData {
+  final String date;
+  double minTemp;
+  double maxTemp;
+
+  ForecastData({
+    required this.date,
+    required this.minTemp,
+    required this.maxTemp,
+  });
+}
+
+class LatLng {
+  final double latitude;
+  final double longitude;
+
+  const LatLng(this.latitude, this.longitude);
 }
 
 class WeatherData {

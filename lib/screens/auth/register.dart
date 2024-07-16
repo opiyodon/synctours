@@ -359,7 +359,9 @@ class RegisterState extends State<Register> {
                                       },
                                       style: const TextStyle(
                                           color: AppColors.authInputText),
+
                                       onFieldSubmitted: (_) => _signUp(),
+
                                     ),
                                     const SizedBox(height: 24),
                                     ElevatedButton(

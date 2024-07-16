@@ -174,7 +174,7 @@ class FindCurrentLocationState extends State<FindCurrentLocation> {
       appBar: const CustomAppBar(
         title: 'Current Location',
         actions: [],
-      ),
+      )
       drawer: const CustomDrawer(),
       body: Stack(
         children: [

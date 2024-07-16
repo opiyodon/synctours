@@ -134,6 +134,7 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+
     final user = Provider.of<CustomUser?>(context);
 
     return PopScope(

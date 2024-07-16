@@ -13,6 +13,7 @@ import 'package:synctours/models/user.dart';
 import 'package:synctours/models/favorite_place.dart';
 
 class PlaceDetails extends StatefulWidget {
+
   final Map<String, dynamic> place;
 
   const PlaceDetails({super.key, required this.place});
@@ -88,7 +89,9 @@ class PlaceDetailsState extends State<PlaceDetails> {
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         title: Text(
+
           widget.place['name'] ?? 'Place Details',
+
           style: const TextStyle(color: AppColors.buttonText),
         ),
         elevation: 0.0,
@@ -108,6 +111,7 @@ class PlaceDetailsState extends State<PlaceDetails> {
                 autoPlay: true,
                 autoPlayInterval: const Duration(seconds: 7),
               ),
+
               items: [
                 (widget.place['images'] as List<dynamic>? ?? []).firstOrNull
               ].whereType<String>().map<Widget>((image) {
@@ -117,6 +121,7 @@ class PlaceDetailsState extends State<PlaceDetails> {
                   errorBuilder: (context, error, stackTrace) {
                     return const Center(child: Text('Image not available'));
                   },
+
                 );
               }).toList(),
             ),
@@ -130,8 +135,10 @@ class PlaceDetailsState extends State<PlaceDetails> {
                     children: [
                       Expanded(
                         child: Text(
+
                           widget.place['description'] ??
                               'No description available',
+
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -139,8 +146,10 @@ class PlaceDetailsState extends State<PlaceDetails> {
                         ),
                       ),
                       FavoriteButton(
+
                         isFavorite: _isFavorite,
                         valueChanged: _toggleFavorite,
+
                         iconSize: 60,
                       ),
                     ],
@@ -151,6 +160,7 @@ class PlaceDetailsState extends State<PlaceDetails> {
                   Text('State: ${widget.place['state'] ?? 'N/A'}'),
                   Text('City: ${widget.place['city'] ?? 'N/A'}'),
                   Text('Postcode: ${widget.place['postcode'] ?? 'N/A'}'),
+
                   const SizedBox(height: 30),
                   GridView.count(
                     shrinkWrap: true,
@@ -165,8 +175,10 @@ class PlaceDetailsState extends State<PlaceDetails> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
+
                               builder: (context) => LocateInMap(
                                   location: widget.place['formatted'] ?? ''),
+
                             ),
                           );
                         },
@@ -200,8 +212,10 @@ class PlaceDetailsState extends State<PlaceDetails> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
+
                               builder: (context) => WeatherForecast(
                                   location: widget.place['formatted'] ?? ''),
+
                             ),
                           );
                         },
@@ -237,6 +251,7 @@ class PlaceDetailsState extends State<PlaceDetails> {
                             MaterialPageRoute(
                               builder: (context) => VideoSearch(
                                   location: widget.place['formatted'] ?? ''),
+
                             ),
                           );
                         },
@@ -271,7 +286,9 @@ class PlaceDetailsState extends State<PlaceDetails> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => CalculateDistance(
+
                                   location: widget.place['formatted'] ?? ''),
+
                             ),
                           );
                         },
@@ -302,6 +319,7 @@ class PlaceDetailsState extends State<PlaceDetails> {
                       ),
                     ],
                   ),
+
                 ],
               ),
             ),
