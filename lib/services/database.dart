@@ -165,4 +165,23 @@ class DatabaseService {
       return null;
     }
   }
+
+  Future<bool> isPlaceFavorite(String placeId) async {
+    try {
+      final docSnapshot = await favoritePlacesCollection
+          .where('uid', isEqualTo: uid)
+          .where('id', isEqualTo: placeId)
+          .limit(1)
+          .get();
+
+      if (docSnapshot.docs.isNotEmpty) {
+        final data = docSnapshot.docs.first.data() as Map<String, dynamic>;
+        return data['isFavorite'] ?? false;
+      }
+      return false;
+    } catch (e) {
+      print('Error checking if place is favorite: $e');
+      return false;
+    }
+  }
 }

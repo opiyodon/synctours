@@ -39,12 +39,12 @@ class DestinationCard extends StatelessWidget {
               flex: 3,
               child: ClipRRect(
                 borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(12.0)),
+                    const BorderRadius.vertical(top: Radius.circular(12.0)),
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
                   fit: BoxFit.cover,
                   placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
