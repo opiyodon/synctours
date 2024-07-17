@@ -10,7 +10,6 @@ import 'package:synctours/services/database.dart';
 import 'package:synctours/theme/colors.dart';
 import 'package:synctours/widgets/loading.dart';
 
-
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
@@ -19,7 +18,6 @@ class Profile extends StatefulWidget {
 }
 
 class ProfileState extends State<Profile> {
-
   bool _isLoggingOut = false;
 
   void _navigateTo(BuildContext context, Widget page) {
@@ -54,7 +52,6 @@ class ProfileState extends State<Profile> {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +89,6 @@ class ProfileState extends State<Profile> {
               iconTheme: const IconThemeData(
                 color: AppColors.buttonText,
               ),
-
             ),
             body: SingleChildScrollView(
               child: Padding(
@@ -113,7 +109,6 @@ class ProfileState extends State<Profile> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-
                               Text(
                                 userData.fullname,
                                 style: const TextStyle(
@@ -128,7 +123,6 @@ class ProfileState extends State<Profile> {
                               fontSize: 16,
                               color: Colors.grey[600],
                             ),
-
                           ),
                         ],
                       ),
@@ -138,7 +132,6 @@ class ProfileState extends State<Profile> {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
-
                     buildListTile(
                         Icons.person,
                         'Personal information',
@@ -194,7 +187,6 @@ class ProfileState extends State<Profile> {
                             fontSize: 18.0,
                             color: AppColors.buttonText,
                           ),
-
                         ),
                       ),
                     ),
@@ -205,9 +197,7 @@ class ProfileState extends State<Profile> {
           );
         } else {
           return const Scaffold(
-
             body: Center(child: Loading()),
-
           );
         }
       },
@@ -224,4 +214,3 @@ class ProfileState extends State<Profile> {
     );
   }
 }
-

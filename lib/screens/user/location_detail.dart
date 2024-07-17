@@ -6,6 +6,7 @@ import 'package:synctours/screens/user/place_details.dart';
 import 'package:synctours/services/database.dart';
 import 'package:synctours/theme/colors.dart';
 import 'package:synctours/widgets/loading.dart';
+import 'package:intl/intl.dart';
 
 class LocationDetail extends StatelessWidget {
   final String name;
@@ -104,6 +105,13 @@ class LocationDetail extends StatelessWidget {
                                 style: TextStyle(
                                     fontSize: 16, color: Colors.grey[600]),
                               ),
+                              const SizedBox(height: 8),
+                              if (place.timestamp != null)
+                                Text(
+                                  'Saved on: ${DateFormat('MMM d, yyyy').format(place.timestamp!)}',
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.grey[600]),
+                                ),
                             ],
                           ),
                         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:synctours/models/user.dart';
 import 'package:synctours/theme/colors.dart';
 import 'package:synctours/services/database.dart';
+import 'package:synctours/widgets/loading.dart';
 
 class PersonalInformation extends StatefulWidget {
   final UserData userData;
@@ -19,6 +20,7 @@ class PersonalInformationState extends State<PersonalInformation> {
   late TextEditingController _usernameController;
   late TextEditingController _phoneNumberController;
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -39,6 +41,9 @@ class PersonalInformationState extends State<PersonalInformation> {
 
   Future<void> _updateUserInfo() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true; // Set loading to true when starting the update
+      });
       try {
         await DatabaseService(uid: widget.uid).updateUserData(
           _fullNameController.text,
@@ -52,6 +57,10 @@ class PersonalInformationState extends State<PersonalInformation> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error updating information: $e')),
         );
+      } finally {
+        setState(() {
+          _isLoading = false; // Set loading to false when update is complete
+        });
       }
     }
   }
@@ -70,56 +79,59 @@ class PersonalInformationState extends State<PersonalInformation> {
           color: AppColors.buttonText,
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
+      body: _isLoading
+          ? const Loading() // Show Loading widget when _isLoading is true
+          : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Center(
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundColor: AppColors.accent,
-                        child:
-                            Icon(Icons.person, size: 60, color: Colors.white),
+                child: Form(
+                  key: _formKey,
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Center(
+                            child: CircleAvatar(
+                              radius: 50,
+                              backgroundColor: AppColors.accent,
+                              child: Icon(Icons.person,
+                                  size: 60, color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          buildInfoSection('Full Name', _fullNameController),
+                          buildInfoSection('Username', _usernameController),
+                          buildInfoSection(
+                              'Phone Number', _phoneNumberController),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: _updateUserInfo,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.accent,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 50, vertical: 10),
+                              ),
+                              child: const Text(
+                                'Save Changes',
+                                style: TextStyle(color: AppColors.buttonText),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    buildInfoSection('Full Name', _fullNameController),
-                    buildInfoSection('Username', _usernameController),
-                    buildInfoSection('Phone Number', _phoneNumberController),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: _updateUserInfo,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.accent,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 10),
-                        ),
-                        child: const Text(
-                          'Save Changes',
-                          style: TextStyle(color: AppColors.buttonText),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 

@@ -100,12 +100,14 @@ class DatabaseService {
         // Update existing document
         await querySnapshot.docs.first.reference.update({
           'isFavorite': place.isFavorite,
+          'timestamp': place.isFavorite ? FieldValue.serverTimestamp() : null,
         });
       } else {
         // Create new document
         await favoritePlacesCollection.add({
           ...place.toMap(),
           'uid': uid,
+          'timestamp': FieldValue.serverTimestamp(),
         });
       }
     } catch (e) {
@@ -135,6 +137,7 @@ class DatabaseService {
     return favoritePlacesCollection
         .where('uid', isEqualTo: uid)
         .where('isFavorite', isEqualTo: true)
+        .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
