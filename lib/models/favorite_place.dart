@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class FavoritePlace {
   final String id;
   final String name;
@@ -5,6 +7,7 @@ class FavoritePlace {
   final String image;
   final bool isFavorite;
   final String uid;
+  final DateTime? timestamp;
 
   FavoritePlace({
     required this.id,
@@ -13,6 +16,7 @@ class FavoritePlace {
     required this.image,
     required this.isFavorite,
     required this.uid,
+    this.timestamp,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +27,7 @@ class FavoritePlace {
       'image': image,
       'isFavorite': isFavorite,
       'uid': uid,
+      'timestamp': timestamp?.toIso8601String(),
     };
   }
 
@@ -34,6 +39,9 @@ class FavoritePlace {
       image: map['image'] ?? '',
       isFavorite: map['isFavorite'] ?? false,
       uid: map['uid'] ?? '',
+      timestamp: map['timestamp'] != null
+          ? (map['timestamp'] as Timestamp).toDate()
+          : null,
     );
   }
 
@@ -44,6 +52,7 @@ class FavoritePlace {
     String? image,
     bool? isFavorite,
     String? uid,
+    DateTime? timestamp,
   }) {
     return FavoritePlace(
       id: id ?? this.id,
@@ -52,6 +61,7 @@ class FavoritePlace {
       image: image ?? this.image,
       isFavorite: isFavorite ?? this.isFavorite,
       uid: uid ?? this.uid,
+      timestamp: timestamp ?? this.timestamp,
     );
   }
 }
