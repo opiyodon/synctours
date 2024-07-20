@@ -28,21 +28,42 @@ class AuthService {
 
   // registerWithEmailAndPassword
   Future<CustomUser?> registerWithEmailAndPassword(
-      String email, String password, String fullname, String username, String phoneNumber) async {
+      String email,
+      String password,
+      String fullname,
+      String username,
+      String phoneNumber) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+          email: email, password: password);
       User? user = result.user;
-      await DatabaseService(uid: user!.uid).updateUserData(
-        fullname,
-        username,
-        phoneNumber,
-      );
+      await DatabaseService(uid: user!.uid)
+          .updateUserData(fullname, username, phoneNumber);
       return _userFromFirebaseUser(user);
     } catch (e) {
       return null;
+    }
+  }
+
+  // deleteUser
+  Future<void> deleteUser(String password) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        // Reauthenticate user before deletion
+        AuthCredential credential = EmailAuthProvider.credential(
+          email: user.email!,
+          password: password,
+        );
+        await user.reauthenticateWithCredential(credential);
+
+        // Delete user
+        await user.delete();
+      } else {
+        throw Exception('No user is currently signed in');
+      }
+    } catch (e) {
+      throw Exception('Failed to delete user: $e');
     }
   }
 
