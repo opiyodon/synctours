@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FavoritePlace {
-  final String id;
+  final String placeId;
   final String name;
   final String formatted;
   final String image;
@@ -10,7 +10,7 @@ class FavoritePlace {
   final DateTime? timestamp;
 
   FavoritePlace({
-    required this.id,
+    required this.placeId,
     required this.name,
     required this.formatted,
     required this.image,
@@ -21,7 +21,7 @@ class FavoritePlace {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      'placeId': placeId,
       'name': name,
       'formatted': formatted,
       'image': image,
@@ -33,7 +33,7 @@ class FavoritePlace {
 
   factory FavoritePlace.fromMap(Map<String, dynamic> map) {
     return FavoritePlace(
-      id: map['id'] ?? '',
+      placeId: map['placeId'] ?? '',
       name: map['name'] ?? '',
       formatted: map['formatted'] ?? '',
       image: map['image'] ?? '',
@@ -46,7 +46,7 @@ class FavoritePlace {
   }
 
   FavoritePlace copyWith({
-    String? id,
+    String? placeId,
     String? name,
     String? formatted,
     String? image,
@@ -55,7 +55,7 @@ class FavoritePlace {
     DateTime? timestamp,
   }) {
     return FavoritePlace(
-      id: id ?? this.id,
+      placeId: placeId ?? this.placeId,
       name: name ?? this.name,
       formatted: formatted ?? this.formatted,
       image: image ?? this.image,

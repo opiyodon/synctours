@@ -7,6 +7,7 @@ class DestinationCard extends StatelessWidget {
   final String subtitle;
   final String imageUrl;
   final Map<String, dynamic> placeDetails;
+  final String placeId;
 
   const DestinationCard({
     super.key,
@@ -14,6 +15,7 @@ class DestinationCard extends StatelessWidget {
     required this.subtitle,
     required this.imageUrl,
     required this.placeDetails,
+    required this.placeId,
   });
 
   @override
@@ -23,7 +25,10 @@ class DestinationCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PlaceDetails(place: placeDetails),
+            builder: (context) => PlaceDetails(
+              place: placeDetails,
+              placeId: placeId,
+            ),
           ),
         );
       },

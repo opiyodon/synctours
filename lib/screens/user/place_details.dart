@@ -1,21 +1,26 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:favorite_button/favorite_button.dart';
+import 'package:synctours/models/favorite_place.dart';
 import 'package:synctours/screens/user/weather_forecast.dart';
 import 'package:synctours/screens/user/locate_in_map.dart';
 import 'package:synctours/screens/user/calculate_distance.dart';
 import 'package:synctours/screens/user/video_search.dart';
+import 'package:synctours/services/place_image_service.dart';
 import 'package:synctours/theme/colors.dart';
 import 'package:synctours/services/database.dart';
 import 'package:provider/provider.dart';
 import 'package:synctours/models/user.dart';
-import 'package:synctours/models/favorite_place.dart';
 
 class PlaceDetails extends StatefulWidget {
   final Map<String, dynamic> place;
+  final String placeId;
 
-  const PlaceDetails({super.key, required this.place});
+  const PlaceDetails({
+    super.key,
+    required this.place,
+    required this.placeId,
+  });
 
   @override
   PlaceDetailsState createState() => PlaceDetailsState();
@@ -29,8 +34,7 @@ class PlaceDetailsState extends State<PlaceDetails> {
     super.initState();
     final user = Provider.of<CustomUser?>(context, listen: false);
     _favoritePlace = FavoritePlace(
-      id: widget.place['id'] ??
-          FirebaseFirestore.instance.collection('favorite_places').doc().id,
+      placeId: PlaceImageService.generatePlaceId(widget.place),
       name: widget.place['name'] ?? '',
       formatted: widget.place['formatted'] ?? '',
       image: widget.place['images']?.isNotEmpty == true
@@ -126,7 +130,7 @@ class PlaceDetailsState extends State<PlaceDetails> {
                       if (user != null)
                         StreamBuilder<bool>(
                           stream: DatabaseService(uid: user.uid!)
-                              .isPlaceFavoriteStream(_favoritePlace.id),
+                              .isPlaceFavoriteStream(widget.placeId),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {

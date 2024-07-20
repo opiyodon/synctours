@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:crypto/crypto.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,7 +54,15 @@ class PlaceImageService {
     return false;
   }
 
-  static Future<Map<String, dynamic>> fetchPlaceDetails(String query) async {
+  static String generatePlaceId(Map<String, dynamic> place) {
+    String uniqueString = '${place['name']}${place['formatted']}${place['country']}';
+    var bytes = utf8.encode(uniqueString);
+    var digest = sha256.convert(bytes);
+    return digest.toString().substring(0, 16);
+  }
+
+  static Future<Map<String, dynamic>> fetchPlaceDetails(
+      String query, String userId) async {
     if (await _canMakeRequest()) {
       await _enforceRateLimit();
 
@@ -101,6 +110,8 @@ class PlaceImageService {
                 unsplashData.map((image) => image['urls']['regular']).toList(),
           };
 
+          placeDetails['id'] = generatePlaceId(placeDetails);
+
           return placeDetails;
         } else {
           throw Exception('No results found for the query');
@@ -130,7 +141,8 @@ class PlaceImageService {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> fetchAllPlaces() async {
+  static Future<List<Map<String, dynamic>>> fetchAllPlaces(
+      String userId) async {
     List<String> allPlaces = getDestinationNames();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, dynamic> cache =
@@ -144,7 +156,7 @@ class PlaceImageService {
               _cacheExpiration) {
         futures.add(Future.value(cache[place]['data']));
       } else {
-        futures.add(fetchPlaceDetails(place).then((details) {
+        futures.add(fetchPlaceDetails(place, userId).then((details) {
           cache[place] = {
             'data': details,
             'timestamp': DateTime.now().toIso8601String(),
@@ -162,9 +174,10 @@ class PlaceImageService {
     return placeDetailsList.where((place) => place.isNotEmpty).toList();
   }
 
-  static Future<List<Map<String, dynamic>>> searchPlaces(String query) async {
+  static Future<List<Map<String, dynamic>>> searchPlaces(
+      String query, String userId) async {
     try {
-      final details = await fetchPlaceDetails(query);
+      final details = await fetchPlaceDetails(query, userId);
       return [details];
     } catch (e) {
       print("Error searching places: $e");

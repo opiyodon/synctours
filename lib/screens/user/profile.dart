@@ -169,7 +169,7 @@ class ProfileState extends State<Profile> {
                                 () => LocationDetail(
                                   name: place.name,
                                   formatted: place.formatted,
-                                  placeId: place.id,
+                                  placeId: place.placeId,
                                 ),
                               );
                             }).toList(),
