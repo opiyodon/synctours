@@ -28,6 +28,30 @@ class DatabaseService {
     }
   }
 
+  Future<void> deleteUserData() async {
+    try {
+      // Delete user document
+      await userCollection.doc(uid).delete();
+
+      // Delete user's recent searches
+      var recentSearches =
+          await recentSearchCollection.where('uid', isEqualTo: uid).get();
+      for (var doc in recentSearches.docs) {
+        await doc.reference.delete();
+      }
+
+      // Delete user's favorite places
+      var favoritePlaces =
+          await favoritePlacesCollection.where('uid', isEqualTo: uid).get();
+      for (var doc in favoritePlaces.docs) {
+        await doc.reference.delete();
+      }
+    } catch (e) {
+      print('Error deleting user data: $e');
+      rethrow;
+    }
+  }
+
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>?;
     return UserData(
