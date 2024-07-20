@@ -6,7 +6,6 @@ import 'package:synctours/widgets/loading.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VideoSearch extends StatefulWidget {
   final String location;
@@ -19,7 +18,6 @@ class VideoSearch extends StatefulWidget {
 
 class VideoSearchState extends State<VideoSearch> {
   final YoutubeExplode _youtubeExplode = YoutubeExplode();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _searchController = TextEditingController();
   List<Video> _videos = [];
   Video? _selectedVideo;
@@ -76,10 +74,6 @@ class VideoSearchState extends State<VideoSearch> {
         autoPlay: true,
         looping: false,
       );
-
-      _firestore
-          .collection('watch_history')
-          .add({'videoId': video.id.value, 'timestamp': Timestamp.now()});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading video: $e')),
@@ -102,12 +96,10 @@ class VideoSearchState extends State<VideoSearch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: const CustomAppBar(
         title: 'Video Search',
         actions: [],
       ),
-
       drawer: const CustomDrawer(),
       body: RefreshIndicator(
         onRefresh: () => searchVideos(_searchedLocation),
@@ -222,9 +214,33 @@ class VideoSearchState extends State<VideoSearch> {
                                         top: Radius.circular(15.0)),
                                     child: AspectRatio(
                                       aspectRatio: 16 / 9,
-                                      child: Image.network(
-                                        video.thumbnails.highResUrl,
+                                      child: FadeInImage(
+                                        placeholder: const AssetImage(
+                                            'assets/icon/placeholder_thumbnail.png'),
+                                        image: NetworkImage(
+                                            video.thumbnails.highResUrl),
                                         fit: BoxFit.cover,
+                                        imageErrorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.network(
+                                            video.thumbnails.mediumResUrl,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.network(
+                                                video.thumbnails.lowResUrl,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Image.asset(
+                                                    'assets/icon/placeholder_thumbnail.png',
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),

@@ -324,6 +324,7 @@ class PersonalInformationState extends State<PersonalInformation> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
+              hintText: 'Enter your password',
               suffixIcon: const Icon(Icons.lock, color: Colors.red),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30.0),
