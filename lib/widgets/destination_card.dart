@@ -7,6 +7,7 @@ class DestinationCard extends StatelessWidget {
   final String subtitle;
   final String imageUrl;
   final Map<String, dynamic> placeDetails;
+  final String placeId;
 
   const DestinationCard({
     super.key,
@@ -14,6 +15,7 @@ class DestinationCard extends StatelessWidget {
     required this.subtitle,
     required this.imageUrl,
     required this.placeDetails,
+    required this.placeId,
   });
 
   @override
@@ -23,7 +25,10 @@ class DestinationCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PlaceDetails(place: placeDetails),
+            builder: (context) => PlaceDetails(
+              place: placeDetails,
+              placeId: placeId,
+            ),
           ),
         );
       },
@@ -39,12 +44,12 @@ class DestinationCard extends StatelessWidget {
               flex: 3,
               child: ClipRRect(
                 borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(12.0)),
+                    const BorderRadius.vertical(top: Radius.circular(12.0)),
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
                   fit: BoxFit.cover,
                   placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),

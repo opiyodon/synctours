@@ -1,39 +1,40 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:favorite_button/favorite_button.dart';
+import 'package:synctours/models/favorite_place.dart';
 import 'package:synctours/screens/user/weather_forecast.dart';
 import 'package:synctours/screens/user/locate_in_map.dart';
 import 'package:synctours/screens/user/calculate_distance.dart';
 import 'package:synctours/screens/user/video_search.dart';
+import 'package:synctours/services/place_image_service.dart';
 import 'package:synctours/theme/colors.dart';
 import 'package:synctours/services/database.dart';
 import 'package:provider/provider.dart';
 import 'package:synctours/models/user.dart';
-import 'package:synctours/models/favorite_place.dart';
 
 class PlaceDetails extends StatefulWidget {
-
   final Map<String, dynamic> place;
+  final String placeId;
 
-  const PlaceDetails({super.key, required this.place});
+  const PlaceDetails({
+    super.key,
+    required this.place,
+    required this.placeId,
+  });
 
   @override
   PlaceDetailsState createState() => PlaceDetailsState();
 }
 
 class PlaceDetailsState extends State<PlaceDetails> {
-  late Stream<DocumentSnapshot> _favoriteStream;
   late FavoritePlace _favoritePlace;
-  bool _isFavorite = false;
 
   @override
   void initState() {
     super.initState();
     final user = Provider.of<CustomUser?>(context, listen: false);
     _favoritePlace = FavoritePlace(
-      id: widget.place['id'] ??
-          FirebaseFirestore.instance.collection('favorite_places').doc().id,
+      placeId: PlaceImageService.generatePlaceId(widget.place),
       name: widget.place['name'] ?? '',
       formatted: widget.place['formatted'] ?? '',
       image: widget.place['images']?.isNotEmpty == true
@@ -42,21 +43,6 @@ class PlaceDetailsState extends State<PlaceDetails> {
       isFavorite: false,
       uid: user?.uid ?? '',
     );
-
-    if (user != null && user.uid != null) {
-      _favoriteStream = FirebaseFirestore.instance
-          .collection('favorite_places')
-          .doc(_favoritePlace.id)
-          .snapshots();
-      _favoriteStream.listen((snapshot) {
-        if (snapshot.exists) {
-          final data = snapshot.data() as Map<String, dynamic>?;
-          setState(() {
-            _isFavorite = data?['isFavorite'] ?? false;
-          });
-        }
-      });
-    }
   }
 
   void _toggleFavorite(bool isFavorite) async {
@@ -66,9 +52,6 @@ class PlaceDetailsState extends State<PlaceDetails> {
         _favoritePlace = _favoritePlace.copyWith(isFavorite: isFavorite);
         await DatabaseService(uid: user.uid!)
             .toggleFavoritePlace(_favoritePlace);
-        setState(() {
-          _isFavorite = isFavorite;
-        });
       } catch (e) {
         print("Error toggling favorite place: $e");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -83,15 +66,19 @@ class PlaceDetailsState extends State<PlaceDetails> {
     }
   }
 
+  String _formatLocation(String location) {
+    return location.split(',').first.trim();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<CustomUser?>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         title: Text(
-
           widget.place['name'] ?? 'Place Details',
-
           style: const TextStyle(color: AppColors.buttonText),
         ),
         elevation: 0.0,
@@ -111,17 +98,14 @@ class PlaceDetailsState extends State<PlaceDetails> {
                 autoPlay: true,
                 autoPlayInterval: const Duration(seconds: 7),
               ),
-
-              items: [
-                (widget.place['images'] as List<dynamic>? ?? []).firstOrNull
-              ].whereType<String>().map<Widget>((image) {
+              items: (widget.place['images'] as List<dynamic>? ?? [])
+                  .map<Widget>((image) {
                 return Image.network(
                   image,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return const Center(child: Text('Image not available'));
                   },
-
                 );
               }).toList(),
             ),
@@ -135,23 +119,31 @@ class PlaceDetailsState extends State<PlaceDetails> {
                     children: [
                       Expanded(
                         child: Text(
-
                           widget.place['description'] ??
                               'No description available',
-
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      FavoriteButton(
-
-                        isFavorite: _isFavorite,
-                        valueChanged: _toggleFavorite,
-
-                        iconSize: 60,
-                      ),
+                      if (user != null)
+                        StreamBuilder<bool>(
+                          stream: DatabaseService(uid: user.uid!)
+                              .isPlaceFavoriteStream(widget.placeId),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            }
+                            bool isFavorite = snapshot.data ?? false;
+                            return FavoriteButton(
+                              isFavorite: isFavorite,
+                              valueChanged: _toggleFavorite,
+                              iconSize: 60,
+                            );
+                          },
+                        ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -160,7 +152,6 @@ class PlaceDetailsState extends State<PlaceDetails> {
                   Text('State: ${widget.place['state'] ?? 'N/A'}'),
                   Text('City: ${widget.place['city'] ?? 'N/A'}'),
                   Text('Postcode: ${widget.place['postcode'] ?? 'N/A'}'),
-
                   const SizedBox(height: 30),
                   GridView.count(
                     shrinkWrap: true,
@@ -175,10 +166,9 @@ class PlaceDetailsState extends State<PlaceDetails> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-
                               builder: (context) => LocateInMap(
-                                  location: widget.place['formatted'] ?? ''),
-
+                                  location: _formatLocation(
+                                      widget.place['formatted'] ?? '')),
                             ),
                           );
                         },
@@ -212,10 +202,9 @@ class PlaceDetailsState extends State<PlaceDetails> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-
                               builder: (context) => WeatherForecast(
-                                  location: widget.place['formatted'] ?? ''),
-
+                                  location: _formatLocation(
+                                      widget.place['formatted'] ?? '')),
                             ),
                           );
                         },
@@ -250,8 +239,8 @@ class PlaceDetailsState extends State<PlaceDetails> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => VideoSearch(
-                                  location: widget.place['formatted'] ?? ''),
-
+                                  location: _formatLocation(
+                                      widget.place['formatted'] ?? '')),
                             ),
                           );
                         },
@@ -286,9 +275,8 @@ class PlaceDetailsState extends State<PlaceDetails> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => CalculateDistance(
-
-                                  location: widget.place['formatted'] ?? ''),
-
+                                  location: _formatLocation(
+                                      widget.place['formatted'] ?? '')),
                             ),
                           );
                         },
@@ -319,7 +307,6 @@ class PlaceDetailsState extends State<PlaceDetails> {
                       ),
                     ],
                   ),
-
                 ],
               ),
             ),

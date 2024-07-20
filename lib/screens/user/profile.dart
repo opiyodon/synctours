@@ -148,6 +148,18 @@ class ProfileState extends State<Profile> {
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           List<FavoritePlace> favoritePlaces = snapshot.data!;
+                          if (favoritePlaces.isEmpty) {
+                            return buildListTile(
+                              Icons.star_border,
+                              'No favorite places yet',
+                              context,
+                              () => const LocationDetail(
+                                name: 'No favorite places yet',
+                                formatted: 'Favorite a place to view them here',
+                                placeId: '0',
+                              ),
+                            );
+                          }
                           return Column(
                             children: favoritePlaces.take(5).map((place) {
                               return buildListTile(
@@ -157,7 +169,7 @@ class ProfileState extends State<Profile> {
                                 () => LocationDetail(
                                   name: place.name,
                                   formatted: place.formatted,
-                                  placeId: place.id,
+                                  placeId: place.placeId,
                                 ),
                               );
                             }).toList(),

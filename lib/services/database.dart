@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:synctours/models/favorite_place.dart';
 import 'package:synctours/models/user.dart';
 import 'package:synctours/models/recent_search.dart';
-import 'package:synctours/models/favorite_place.dart';
 
 class DatabaseService {
   final String uid;
@@ -91,7 +91,7 @@ class DatabaseService {
     try {
       final docRef = favoritePlacesCollection
           .where('uid', isEqualTo: uid)
-          .where('id', isEqualTo: place.id)
+          .where('placeId', isEqualTo: place.placeId)
           .limit(1);
 
       final querySnapshot = await docRef.get();
@@ -122,7 +122,7 @@ class DatabaseService {
     }
     return favoritePlacesCollection
         .where('uid', isEqualTo: uid)
-        .where('id', isEqualTo: placeId)
+        .where('placeId', isEqualTo: placeId)
         .snapshots()
         .map((snapshot) {
       if (snapshot.docs.isNotEmpty) {
@@ -151,7 +151,7 @@ class DatabaseService {
     try {
       final docSnapshot = await favoritePlacesCollection
           .where('uid', isEqualTo: uid)
-          .where('id', isEqualTo: placeId)
+          .where('placeId', isEqualTo: placeId)
           .limit(1)
           .get();
 
@@ -163,6 +163,25 @@ class DatabaseService {
     } catch (e) {
       print('Error fetching favorite place: $e');
       return null;
+    }
+  }
+
+  Future<bool> isPlaceFavorite(String placeId) async {
+    try {
+      final docSnapshot = await favoritePlacesCollection
+          .where('uid', isEqualTo: uid)
+          .where('placeId', isEqualTo: placeId)
+          .limit(1)
+          .get();
+
+      if (docSnapshot.docs.isNotEmpty) {
+        final data = docSnapshot.docs.first.data() as Map<String, dynamic>;
+        return data['isFavorite'] ?? false;
+      }
+      return false;
+    } catch (e) {
+      print('Error checking if place is favorite: $e');
+      return false;
     }
   }
 }

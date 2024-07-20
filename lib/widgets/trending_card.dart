@@ -6,12 +6,14 @@ class TrendingCard extends StatelessWidget {
   final String title;
   final String imageUrl;
   final Map<String, dynamic> placeDetails;
+  final String placeId;
 
   const TrendingCard({
     super.key,
     required this.title,
     required this.imageUrl,
     required this.placeDetails,
+    required this.placeId,
   });
 
   @override
@@ -21,7 +23,10 @@ class TrendingCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PlaceDetails(place: placeDetails),
+            builder: (context) => PlaceDetails(
+              place: placeDetails,
+              placeId: placeId,
+            ),
           ),
         );
       },
@@ -36,7 +41,7 @@ class TrendingCard extends StatelessWidget {
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
                 placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
+                    const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
               Align(

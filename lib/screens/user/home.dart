@@ -37,12 +37,20 @@ class HomeState extends State<Home> {
 
   Future<void> _fetchPlaces() async {
     try {
-      allPlaces = await PlaceImageService.fetchAllPlaces();
-      setState(() {
-        featuredDestinations = allPlaces.take(4).toList();
-        trendingPlaces = allPlaces.skip(4).take(6).toList();
-        _isLoading = false;
-      });
+      final user = Provider.of<CustomUser?>(context, listen: false);
+      if (user != null && user.uid != null) {
+        allPlaces = await PlaceImageService.fetchAllPlaces(user.uid!);
+        setState(() {
+          featuredDestinations = allPlaces.take(4).toList();
+          trendingPlaces = allPlaces.skip(4).take(6).toList();
+          _isLoading = false;
+        });
+      } else {
+        // Handle the case when the user is not logged in
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       debugPrint("Error fetching places: $e");
       setState(() {
@@ -60,7 +68,6 @@ class HomeState extends State<Home> {
           await DatabaseService(uid: user.uid!).saveRecentSearch(query);
         } catch (e) {
           print('Error saving recent search: $e');
-          // You might want to show a snackbar or some other UI feedback here
         }
       }
       Navigator.push(
@@ -79,62 +86,64 @@ class HomeState extends State<Home> {
         await DatabaseService(uid: user.uid!).clearRecentSearches();
       } catch (e) {
         print('Error clearing recent searches: $e');
-        // You might want to show a snackbar or some other UI feedback here
       }
     }
   }
 
   Future<bool> _onWillPop() async {
     return (await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Are you sure?', textAlign: TextAlign.center),
-        content: const Text('Do you want to exit the app?', textAlign: TextAlign.center),
-        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-        actionsPadding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-        actions: [
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.buttonText,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Are you sure?', textAlign: TextAlign.center),
+            content: const Text('Do you want to exit the app?',
+                textAlign: TextAlign.center),
+            contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+            actionsPadding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+            actions: [
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.buttonText,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('No', style: TextStyle(fontSize: 14)),
                   ),
-                ),
-                child: const Text('No', style: TextStyle(fontSize: 14)),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                  SystemNavigator.pop(); // This line exits the app
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondary,
-                  foregroundColor: AppColors.buttonText,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                      SystemNavigator.pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.secondary,
+                      foregroundColor: AppColors.buttonText,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('Yes', style: TextStyle(fontSize: 14)),
                   ),
-                ),
-                child: const Text('Yes', style: TextStyle(fontSize: 14)),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-    )) ?? false;
+        )) ??
+        false;
   }
 
   @override
   Widget build(BuildContext context) {
-
     final user = Provider.of<CustomUser?>(context);
 
     return PopScope(
@@ -202,6 +211,8 @@ class HomeState extends State<Home> {
                                     ? place['images'][0]
                                     : '',
                                 placeDetails: place,
+                                placeId:
+                                    PlaceImageService.generatePlaceId(place),
                               );
                             },
                             childCount: featuredDestinations.length,
@@ -238,6 +249,8 @@ class HomeState extends State<Home> {
                                       ? place['images'][0]
                                       : '',
                                   placeDetails: place,
+                                  placeId:
+                                      PlaceImageService.generatePlaceId(place),
                                 ),
                               );
                             },
