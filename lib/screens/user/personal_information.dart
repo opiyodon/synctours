@@ -143,23 +143,32 @@ class PersonalInformationState extends State<PersonalInformation> {
           color: AppColors.buttonText,
         ),
       ),
-      body: _isLoading
-          ? const Loading()
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      buildProfileInfoCard(),
-                      const SizedBox(height: 20),
-                      buildDeleteAccountCard(),
-                    ],
-                  ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    buildProfileInfoCard(),
+                    const SizedBox(height: 20),
+                    buildDeleteAccountCard(),
+                  ],
                 ),
               ),
             ),
+          ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: Loading(),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -189,7 +198,7 @@ class PersonalInformationState extends State<PersonalInformation> {
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
-                onPressed: _updateUserInfo,
+                onPressed: _isLoading ? null : _updateUserInfo,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
                   padding:
@@ -248,7 +257,7 @@ class PersonalInformationState extends State<PersonalInformation> {
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
-                onPressed: _deleteUser,
+                onPressed: _isLoading ? null : _deleteUser,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   padding:
@@ -290,7 +299,7 @@ class PersonalInformationState extends State<PersonalInformation> {
                 borderSide: BorderSide.none,
               ),
             ),
-            onFieldSubmitted: (_) => _updateUserInfo(),
+            onFieldSubmitted: (_) => _isLoading ? null : _updateUserInfo(),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter $title';
@@ -331,7 +340,7 @@ class PersonalInformationState extends State<PersonalInformation> {
                 borderSide: BorderSide.none,
               ),
             ),
-            onFieldSubmitted: (_) => _deleteUser(),
+            onFieldSubmitted: (_) => _isLoading ? null : _deleteUser(),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your password';
