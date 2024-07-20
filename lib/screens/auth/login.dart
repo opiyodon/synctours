@@ -19,7 +19,8 @@ class LoginState extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool loading = false;
 
-  // Add a FocusNode for the password field
+  // Add FocusNodes for each text field
+  final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
 
   @override
@@ -128,6 +129,7 @@ class LoginState extends State<Login> {
                                         children: [
                                           TextFormField(
                                             controller: emailController,
+                                            focusNode: _emailFocusNode,
                                             decoration: InputDecoration(
                                               hintText: 'Enter your email',
                                               hintStyle: const TextStyle(
