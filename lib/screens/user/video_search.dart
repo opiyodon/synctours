@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:synctours/theme/colors.dart';
 import 'package:synctours/widgets/custom_app_bar.dart';
 import 'package:synctours/widgets/custom_drawer.dart';
@@ -6,7 +7,6 @@ import 'package:synctours/widgets/loading.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VideoSearch extends StatefulWidget {
   final String location;
@@ -19,7 +19,6 @@ class VideoSearch extends StatefulWidget {
 
 class VideoSearchState extends State<VideoSearch> {
   final YoutubeExplode _youtubeExplode = YoutubeExplode();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _searchController = TextEditingController();
   List<Video> _videos = [];
   Video? _selectedVideo;
@@ -41,6 +40,7 @@ class VideoSearchState extends State<VideoSearch> {
     _videoPlayerController?.dispose();
     _chewieController?.dispose();
     _searchController.dispose();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.dispose();
   }
 
@@ -75,11 +75,18 @@ class VideoSearchState extends State<VideoSearch> {
         videoPlayerController: _videoPlayerController!,
         autoPlay: true,
         looping: false,
+        aspectRatio: 16 / 9,
+        allowFullScreen: true,
+        allowMuting: true,
+        errorBuilder: (context, errorMessage) {
+          return Center(
+            child: Text(
+              errorMessage,
+              style: TextStyle(color: Colors.white),
+            ),
+          );
+        },
       );
-
-      _firestore
-          .collection('watch_history')
-          .add({'videoId': video.id.value, 'timestamp': Timestamp.now()});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading video: $e')),
@@ -97,176 +104,212 @@ class VideoSearchState extends State<VideoSearch> {
       _videoPlayerController?.dispose();
       _chewieController?.dispose();
     });
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        final isPortrait = orientation == Orientation.portrait;
 
-      appBar: const CustomAppBar(
-        title: 'Video Search',
-        actions: [],
-      ),
-
-      drawer: const CustomDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () => searchVideos(_searchedLocation),
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFF4EFE6), Color(0xFFFFFFFF)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Enter location for videos',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  onSubmitted: (value) {
-                    if (value.isNotEmpty) {
-                      searchVideos(value);
-                    }
-                  },
+        return Scaffold(
+          appBar: isPortrait
+              ? CustomAppBar(
+                  title: 'Video Search',
+                  actions: [],
+                )
+              : null,
+          drawer: isPortrait ? CustomDrawer() : null,
+          body: RefreshIndicator(
+            onRefresh: () => searchVideos(_searchedLocation),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFF4EFE6), Color(0xFFFFFFFF)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  children: [
-                    const Icon(Icons.video_library,
-                        color: Color(0xFF1C160C), size: 24),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        _searchedLocation.isEmpty
-                            ? 'All Videos'
-                            : _searchedLocation,
-                        style: const TextStyle(
-                          color: Color(0xFF1C160C),
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+              child: Column(
+                children: [
+                  if (isPortrait) ...[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: 'Enter location for videos',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        onSubmitted: (value) {
+                          if (value.isNotEmpty) {
+                            searchVideos(value);
+                          }
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        children: [
+                          Icon(Icons.video_library,
+                              color: Color(0xFF1C160C), size: 24),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _searchedLocation.isEmpty
+                                  ? 'All Videos'
+                                  : _searchedLocation,
+                              style: TextStyle(
+                                color: Color(0xFF1C160C),
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-              ),
-              if (_selectedVideo != null)
-                Container(
-                  height: 250,
-                  padding: const EdgeInsets.all(16.0),
-                  child: isFetchingVideo
-                      ? const Loading()
-                      : Column(
-                          children: [
-                            Expanded(
-                                child: Chewie(controller: _chewieController!)),
-                            const SizedBox(height: 8),
-                            ElevatedButton.icon(
-                              onPressed: _closeVideoPlayer,
-                              icon: const Icon(Icons.close,
-                                  color: AppColors.buttonText),
-                              label: const Text(
-                                'Close',
-                                style: TextStyle(
-                                  color: AppColors.buttonText,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                              ),
+                  if (_selectedVideo != null)
+                    Expanded(
+                      child: isFetchingVideo
+                          ? Loading()
+                          : AspectRatio(
+                              aspectRatio: isPortrait ? 16 / 9 : 16 / 9,
+                              child: Chewie(controller: _chewieController!),
                             ),
-                          ],
+                    ),
+                  if (_selectedVideo != null && isPortrait)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton.icon(
+                        onPressed: _closeVideoPlayer,
+                        icon: Icon(Icons.close, color: AppColors.buttonText),
+                        label: Text(
+                          'Close',
+                          style: TextStyle(color: AppColors.buttonText),
                         ),
-                ),
-              Expanded(
-                child: isLoading
-                    ? const Loading()
-                    : GridView.builder(
-                        padding: const EdgeInsets.all(16.0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16.0,
-                          mainAxisSpacing: 16.0,
-                          childAspectRatio: 0.75,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
                         ),
-                        itemCount: _videos.length,
-                        itemBuilder: (context, index) {
-                          var video = _videos[index];
-                          return GestureDetector(
-                            onTap: () => _selectVideo(video),
-                            child: Card(
-                              elevation: 4.0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15.0)),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(15.0)),
-                                    child: AspectRatio(
-                                      aspectRatio: 16 / 9,
-                                      child: Image.network(
-                                        video.thumbnails.highResUrl,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            video.title,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            video.author,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                color: Colors.grey[600],
-                                                fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
                       ),
+                    ),
+                  if (_selectedVideo == null)
+                    Expanded(
+                      child: isLoading
+                          ? Loading()
+                          : GridView.builder(
+                              padding: const EdgeInsets.all(16.0),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: isPortrait ? 2 : 3,
+                                crossAxisSpacing: 16.0,
+                                mainAxisSpacing: 16.0,
+                                childAspectRatio: 0.75,
+                              ),
+                              itemCount: _videos.length,
+                              itemBuilder: (context, index) {
+                                var video = _videos[index];
+                                return GestureDetector(
+                                  onTap: () => _selectVideo(video),
+                                  child: Card(
+                                    elevation: 4.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0)),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(15.0)),
+                                          child: AspectRatio(
+                                            aspectRatio: 16 / 9,
+                                            child: FadeInImage(
+                                              placeholder: AssetImage(
+                                                  'assets/placeholder_thumbnail.png'),
+                                              image: NetworkImage(
+                                                  video.thumbnails.highResUrl),
+                                              fit: BoxFit.cover,
+                                              imageErrorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Image.network(
+                                                  video.thumbnails.mediumResUrl,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Image.network(
+                                                      video
+                                                          .thumbnails.lowResUrl,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/placeholder_thumbnail.png',
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  video.title,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14),
+                                                ),
+                                                SizedBox(height: 4),
+                                                Text(
+                                                  video.author,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      color: Colors.grey[600],
+                                                      fontSize: 12),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

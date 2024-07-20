@@ -177,7 +177,10 @@ class ProfileState extends State<Profile> {
                         } else if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');
                         } else {
-                          return const CircularProgressIndicator();
+                          return const CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(AppColors.accent),
+                          );
                         }
                       },
                     ),

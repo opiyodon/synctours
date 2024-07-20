@@ -294,7 +294,11 @@ class HomeState extends State<Home> {
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
-                                      return const CircularProgressIndicator();
+                                      return const CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                AppColors.accent),
+                                      );
                                     } else if (snapshot.hasError) {
                                       print(
                                           'Error fetching recent searches: ${snapshot.error}');

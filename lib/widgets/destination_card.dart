@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:synctours/screens/user/place_details.dart';
+import 'package:synctours/theme/colors.dart';
 
 class DestinationCard extends StatelessWidget {
   final String title;
@@ -48,8 +49,10 @@ class DestinationCard extends StatelessWidget {
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
+                  placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
+                  )),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),

@@ -19,15 +19,23 @@ class CalculateDistance extends StatefulWidget {
 class CalculateDistanceState extends State<CalculateDistance> {
   bool isLoading = false;
   String distance = '';
-  String duration = '';
+  String durationDrivingStr = '';
+  String durationMotorcycleStr = '';
+  String durationWalkingStr = '';
   late TextEditingController startController;
   TextEditingController destinationController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    startController = TextEditingController(text: widget.location);
+    startController =
+        TextEditingController(text: _formatLocation(widget.location));
     _requestLocationPermission();
+  }
+
+  String _formatLocation(String location) {
+    List<String> parts = location.split(',');
+    return parts.isNotEmpty ? parts[0].trim() : location.trim();
   }
 
   @override
@@ -76,17 +84,23 @@ class CalculateDistanceState extends State<CalculateDistance> {
         );
 
         double distanceInKm = distanceInMeters / 1000;
-        double durationInHours =
-            distanceInKm / 60; // Assuming average speed of 60 km/h
+        double durationDriving = distanceInKm / 60;
+        double durationMotorcycle = distanceInKm / 50;
+        double durationWalking = distanceInKm / 5;
 
         setState(() {
           distance = '${distanceInKm.toStringAsFixed(2)} km';
-          duration = '${durationInHours.toStringAsFixed(2)} hours';
+          durationDrivingStr = '${durationDriving.toStringAsFixed(2)} hours';
+          durationMotorcycleStr =
+              '${durationMotorcycle.toStringAsFixed(2)} hours';
+          durationWalkingStr = '${durationWalking.toStringAsFixed(2)} hours';
         });
+      } else {
+        throw Exception('Location not found');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error calculating distance: $e')),
+        SnackBar(content: Text('Error calculating distance: ${e.toString()}')),
       );
     } finally {
       setState(() {
@@ -162,7 +176,7 @@ class CalculateDistanceState extends State<CalculateDistance> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      if (distance.isNotEmpty && duration.isNotEmpty)
+                      if (distance.isNotEmpty)
                         Card(
                           elevation: 4,
                           shape: RoundedRectangleBorder(
@@ -183,17 +197,23 @@ class CalculateDistanceState extends State<CalculateDistance> {
                                   title: 'Distance',
                                   subtitle: distance,
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 16),
                                 ResultItem(
-                                  icon: Icons.access_time,
-                                  title: 'Estimated Duration',
-                                  subtitle: duration,
+                                  icon: Icons.directions_car,
+                                  title: 'Driving',
+                                  subtitle: durationDrivingStr,
                                 ),
                                 const SizedBox(height: 8),
-                                const ResultItem(
-                                  icon: Icons.directions_car,
-                                  title: 'Travel Mode',
-                                  subtitle: 'Driving',
+                                ResultItem(
+                                  icon: Icons.motorcycle,
+                                  title: 'Motorcycle',
+                                  subtitle: durationMotorcycleStr,
+                                ),
+                                const SizedBox(height: 8),
+                                ResultItem(
+                                  icon: Icons.directions_walk,
+                                  title: 'Walking',
+                                  subtitle: durationWalkingStr,
                                 ),
                               ],
                             ),

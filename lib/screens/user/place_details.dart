@@ -134,7 +134,10 @@ class PlaceDetailsState extends State<PlaceDetails> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const CircularProgressIndicator();
+                              return const CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.accent),
+                              );
                             }
                             bool isFavorite = snapshot.data ?? false;
                             return FavoriteButton(
@@ -167,8 +170,8 @@ class PlaceDetailsState extends State<PlaceDetails> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => LocateInMap(
-                                  location: _formatLocation(
-                                      widget.place['formatted'] ?? '')),
+                                location: widget.place['formatted'] ?? '',
+                              ),
                             ),
                           );
                         },
