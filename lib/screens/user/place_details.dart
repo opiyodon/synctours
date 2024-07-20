@@ -170,8 +170,8 @@ class PlaceDetailsState extends State<PlaceDetails> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => LocateInMap(
-                                  location: _formatLocation(
-                                      widget.place['formatted'] ?? '')),
+                                location: widget.place['formatted'] ?? '',
+                              ),
                             ),
                           );
                         },

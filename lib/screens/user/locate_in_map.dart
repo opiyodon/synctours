@@ -54,30 +54,17 @@ class LocateInMapState extends State<LocateInMap> {
     });
 
     try {
-      if (widget.location.isEmpty) {
+      if (widget.location.isNotEmpty) {
+        await searchLocation(widget.location);
+      } else {
         Position position = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high);
         setState(() {
           currentPosition = LatLng(position.latitude, position.longitude);
         });
-      } else {
-        List<Location> locations = await locationFromAddress(widget.location);
-        if (locations.isNotEmpty) {
-          setState(() {
-            currentPosition =
-                LatLng(locations[0].latitude, locations[0].longitude);
-          });
-        }
+        mapController.move(currentPosition!, 12);
+        await fetchNearbyPlaces();
       }
-
-      if (currentPosition == null) {
-        setState(() {
-          currentPosition = defaultLocation;
-        });
-      }
-
-      mapController.move(currentPosition!, 12);
-      await fetchNearbyPlaces();
     } catch (e) {
       _showDefaultLocation();
     } finally {
@@ -120,6 +107,7 @@ class LocateInMapState extends State<LocateInMap> {
         const SnackBar(
             content: Text('Error: Unable to fetch searched location.')),
       );
+      _showDefaultLocation();
     } finally {
       setState(() {
         isLoading = false;
