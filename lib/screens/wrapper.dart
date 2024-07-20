@@ -14,27 +14,44 @@ class Wrapper extends StatefulWidget {
 }
 
 class WrapperState extends State<Wrapper> {
-  bool _isLoading = true;
-  bool _isLoggedIn = false;
+  bool isLoading = true;
+  bool isLoggedIn = false;
+  bool showLogo = true;
 
   @override
   void initState() {
     super.initState();
+    checkFirstLaunch();
+  }
+
+  Future<void> checkFirstLaunch() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasLaunchedBefore = prefs.getBool('hasLaunchedBefore') ?? false;
+    if (!hasLaunchedBefore) {
+      // Show logo for 5 seconds only on the first launch
+      await Future.delayed(const Duration(seconds: 5));
+      prefs.setBool('hasLaunchedBefore', true);
+    }
     checkLoginStatus();
   }
 
   Future<void> checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    bool loggedIn = prefs.getBool('isLoggedIn') ?? false;
     setState(() {
-      _isLoggedIn = isLoggedIn;
-      _isLoading = false;
+      isLoggedIn = loggedIn;
+      isLoading = false;
+      showLogo =
+          false; // Stop showing the logo after the first launch or restart
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
+    final user = Provider.of<CustomUser?>(context);
+
+    // Show the logo screen only during the first launch or restart
+    if (isLoading && showLogo) {
       return Scaffold(
         body: Container(
           decoration: const BoxDecoration(
@@ -49,16 +66,25 @@ class WrapperState extends State<Wrapper> {
           ),
         ),
       );
-    } else {
-      final user = Provider.of<CustomUser?>(context);
-      if (user != null || _isLoggedIn) {
-        return const PopScope(
-          canPop: false,
-          child: Home(),
-        );
-      } else {
-        return const Authentication();
-      }
     }
+
+    // If the user data is being determined
+    if (user == null && isLoggedIn) {
+      // User has logged out, update state
+      setState(() {
+        isLoggedIn = false;
+      });
+    }
+
+    // If user is still being determined
+    if (user == null && !isLoggedIn) {
+      return const Authentication();
+    }
+
+    // If user is logged in or was previously logged in
+    return const PopScope(
+      canPop: false,
+      child: Home(),
+    );
   }
 }
