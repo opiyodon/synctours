@@ -28,6 +28,7 @@ class PlaceDetails extends StatefulWidget {
 
 class PlaceDetailsState extends State<PlaceDetails> {
   late FavoritePlace _favoritePlace;
+  bool _imagesLoaded = false;
 
   @override
   void initState() {
@@ -43,6 +44,17 @@ class PlaceDetailsState extends State<PlaceDetails> {
       isFavorite: false,
       uid: user?.uid ?? '',
     );
+    _loadImages();
+  }
+
+  void _loadImages() async {
+    // Simulate image loading delay
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      setState(() {
+        _imagesLoaded = true;
+      });
+    }
   }
 
   void _toggleFavorite(bool isFavorite) async {
@@ -98,16 +110,41 @@ class PlaceDetailsState extends State<PlaceDetails> {
                 autoPlay: true,
                 autoPlayInterval: const Duration(seconds: 7),
               ),
-              items: (widget.place['images'] as List<dynamic>? ?? [])
-                  .map<Widget>((image) {
-                return Image.network(
-                  image,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Center(child: Text('Image not available'));
-                  },
-                );
-              }).toList(),
+              items: _imagesLoaded
+                  ? (widget.place['images'] as List<dynamic>? ?? [])
+                      .map<Widget>((image) {
+                      return Image.network(
+                        image,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                  AppColors.accent),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                              child: Text('Image not available'));
+                        },
+                      );
+                    }).toList()
+                  : List.generate(
+                      3,
+                      (index) => const Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(AppColors.accent),
+                        ),
+                      ),
+                    ),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
