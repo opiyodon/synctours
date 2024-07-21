@@ -42,7 +42,7 @@ class HomeState extends State<Home> {
         allPlaces = await PlaceImageService.fetchAllPlaces(user.uid!);
         setState(() {
           featuredDestinations = allPlaces.take(4).toList();
-          trendingPlaces = allPlaces.skip(4).take(6).toList();
+          trendingPlaces = allPlaces.skip(4).take(10).toList();
           _isLoading = false;
         });
       } else {

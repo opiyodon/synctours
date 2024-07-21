@@ -17,17 +17,17 @@ class SearchResults extends StatefulWidget {
 
 class SearchResultsState extends State<SearchResults> {
   List<Map<String, dynamic>> searchResults = [];
-  bool _isLoading = true;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _searchPlaces(widget.query);
+    searchPlaces(widget.query);
   }
 
-  Future<void> _searchPlaces(String query) async {
+  Future<void> searchPlaces(String query) async {
     setState(() {
-      _isLoading = true;
+      isLoading = true;
     });
     try {
       final user = Provider.of<CustomUser?>(context, listen: false);
@@ -36,18 +36,18 @@ class SearchResultsState extends State<SearchResults> {
             await PlaceImageService.searchPlaces(query, user.uid!);
         setState(() {
           searchResults = places;
-          _isLoading = false;
+          isLoading = false;
         });
       } else {
         // Handle the case when the user is not logged in
         setState(() {
-          _isLoading = false;
+          isLoading = false;
         });
       }
     } catch (e) {
       debugPrint("Error searching places: $e");
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
     }
   }
@@ -66,10 +66,10 @@ class SearchResultsState extends State<SearchResults> {
           color: AppColors.buttonText,
         ),
       ),
-      body: _isLoading
+      body: isLoading
           ? const Loading()
           : RefreshIndicator(
-              onRefresh: () => _searchPlaces(widget.query),
+              onRefresh: () => searchPlaces(widget.query),
               child: searchResults.isEmpty
                   ? ListView(
                       children: const [
@@ -92,7 +92,9 @@ class SearchResultsState extends State<SearchResults> {
                           title: place['name'] ?? 'Unknown',
                           subtitle: place['formatted'] ??
                               'Explore the beauty of Kenya',
-                          imageUrl: place['images']?[0] ?? '',
+                          imageUrl: place['images']?.isNotEmpty == true
+                              ? place['images'][0]
+                              : '',
                           placeDetails: place,
                           placeId: PlaceImageService.generatePlaceId(place),
                         );

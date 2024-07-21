@@ -23,7 +23,8 @@ class PlaceImageService {
   static const String _lastRequestDateKey = 'lastRequestDate';
   static const String _requestCountKey = 'requestCount';
   static const String _cacheKey = 'placeCache';
-  static const Duration _cacheExpiration = Duration(days: 1);
+  static const Duration _cacheExpiration = Duration(days: 7);
+  static const int _imagesPerRequest = 5;
 
   static Future<void> _enforceRateLimit() async {
     final now = DateTime.now();
@@ -69,75 +70,48 @@ class PlaceImageService {
     if (await _canMakeRequest()) {
       await _enforceRateLimit();
 
-      final geoapifyResponse = await http.get(
-        Uri.parse(
-            '$geopifyApiUrl?text=$query&apiKey=$geopifyApiKey&country=KE'),
-      );
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final cacheKey = 'place_$query';
+        final cachedData = prefs.getString(cacheKey);
 
-      final mapboxResponse = await http.get(
-        Uri.parse(
-            '$mapboxApiUrl/$query.json?access_token=$mapboxApiKey&country=KE'),
-      );
-
-      final pexelsResponse = await http.get(
-        Uri.parse('$pexelsApiUrl?query=$query&per_page=15'),
-        headers: {'Authorization': pexelsApiKey},
-      );
-
-      final unsplashResponse = await http.get(
-        Uri.parse(
-            '$unsplashApiUrl?query=$query&client_id=$unsplashApiKey&per_page=15'),
-      );
-
-      if (geoapifyResponse.statusCode == 200 &&
-          mapboxResponse.statusCode == 200 &&
-          pexelsResponse.statusCode == 200 &&
-          unsplashResponse.statusCode == 200) {
-        final geoapifyData = json.decode(geoapifyResponse.body)['features'];
-        final mapboxData = json.decode(mapboxResponse.body)['features'];
-        final pexelsData = json.decode(pexelsResponse.body)['photos'];
-        final unsplashData = json.decode(unsplashResponse.body)['results'];
-
-        if (geoapifyData.isNotEmpty && mapboxData.isNotEmpty) {
-          final geoapifyPlace = geoapifyData[0]['properties'];
-          final mapboxPlace = mapboxData[0];
-
-          List<String> images = [];
-          // Add Pexels images first
-          images.addAll(
-              pexelsData.map((image) => image['src']['medium'] as String));
-          // Add Unsplash images to fill up to 15 if needed
-          if (images.length < 15) {
-            images.addAll(unsplashData
-                .map((image) => image['urls']['regular'] as String)
-                .take(15 - images.length));
+        if (cachedData != null) {
+          final cachedPlace = json.decode(cachedData);
+          if (DateTime.now()
+                  .difference(DateTime.parse(cachedPlace['timestamp'])) <
+              _cacheExpiration) {
+            return cachedPlace['data'];
           }
+        }
 
-          final placeDetails = {
-            'name':
-                geoapifyPlace['name'] ?? mapboxPlace['place_name'] ?? 'Unknown',
-            'lat': geoapifyPlace['lat'] ?? mapboxPlace['center'][1],
-            'lon': geoapifyPlace['lon'] ?? mapboxPlace['center'][0],
-            'formatted':
-                geoapifyPlace['formatted'] ?? mapboxPlace['place_name'],
-            'categories': geoapifyPlace['categories'] ??
-                mapboxPlace['context'].map((item) => item['id']).toList(),
-            'country': geoapifyPlace['country'] ?? 'Kenya',
-            'state': geoapifyPlace['state'] ?? '',
-            'city': geoapifyPlace['city'] ?? '',
-            'postcode': geoapifyPlace['postcode'] ?? '',
-            'description': mapboxPlace['text'] ?? '',
-            'images': images,
-          };
+        final apis = [
+          _fetchGeoapifyData,
+          _fetchMapboxData,
+          _fetchPexelsImages,
+          _fetchUnsplashImages,
+        ];
 
+        final results = await Future.wait(apis.map((api) => api(query)));
+
+        final placeDetails = _combineApiResults(results);
+
+        if (placeDetails.isNotEmpty) {
           placeDetails['id'] = generatePlaceId(placeDetails);
-
+          await prefs.setString(
+              cacheKey,
+              json.encode({
+                'data': placeDetails,
+                'timestamp': DateTime.now().toIso8601String(),
+              }));
           return placeDetails;
         } else {
-          throw Exception('No results found for the query');
+          print('No results found for query: $query');
+          return {};
         }
-      } else {
-        throw Exception('Failed to load place details');
+      } catch (e, stackTrace) {
+        print('Error in fetchPlaceDetails: $e');
+        print('Stack trace: $stackTrace');
+        return {};
       }
     } else {
       final prefs = await SharedPreferences.getInstance();
@@ -159,6 +133,130 @@ class PlaceImageService {
             'Daily request limit exceeded. Please try again in ${retryTime.inHours} hours. Remaining requests for today: $remainingRequests');
       }
     }
+  }
+
+  static Future<Map<String, dynamic>> _fetchGeoapifyData(String query) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '$geopifyApiUrl?text=$query&apiKey=$geopifyApiKey&country=KE'),
+      );
+      if (response.statusCode == 200) {
+        return {'geoapify': json.decode(response.body)['features']};
+      }
+    } catch (e) {
+      print('Geoapify API error: $e');
+    }
+    return {};
+  }
+
+  static Future<Map<String, dynamic>> _fetchMapboxData(String query) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '$mapboxApiUrl/$query.json?access_token=$mapboxApiKey&country=KE'),
+      );
+      if (response.statusCode == 200) {
+        return {'mapbox': json.decode(response.body)['features']};
+      }
+    } catch (e) {
+      print('Mapbox API error: $e');
+    }
+    return {};
+  }
+
+  static Future<Map<String, dynamic>> _fetchPexelsImages(String query) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$pexelsApiUrl?query=$query&per_page=$_imagesPerRequest'),
+        headers: {'Authorization': pexelsApiKey},
+      );
+      if (response.statusCode == 200) {
+        return {'pexels': json.decode(response.body)['photos']};
+      }
+    } catch (e) {
+      print('Pexels API error: $e');
+    }
+    return {};
+  }
+
+  static Future<Map<String, dynamic>> _fetchUnsplashImages(String query) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '$unsplashApiUrl?query=$query&client_id=$unsplashApiKey&per_page=$_imagesPerRequest'),
+      );
+      if (response.statusCode == 200) {
+        return {'unsplash': json.decode(response.body)['results']};
+      }
+    } catch (e) {
+      print('Unsplash API error: $e');
+    }
+    return {};
+  }
+
+  static Map<String, dynamic> _combineApiResults(
+      List<Map<String, dynamic>> results) {
+    final geoapifyData = results.firstWhere((r) => r.containsKey('geoapify'),
+        orElse: () => {})['geoapify'];
+    final mapboxData = results.firstWhere((r) => r.containsKey('mapbox'),
+        orElse: () => {})['mapbox'];
+    final pexelsData = results.firstWhere((r) => r.containsKey('pexels'),
+        orElse: () => {})['pexels'];
+    final unsplashData = results.firstWhere((r) => r.containsKey('unsplash'),
+        orElse: () => {})['unsplash'];
+
+    if ((geoapifyData?.isEmpty ?? true) && (mapboxData?.isEmpty ?? true)) {
+      return {};
+    }
+
+    final geoapifyPlace =
+        geoapifyData?.isNotEmpty == true ? geoapifyData[0]['properties'] : null;
+    final mapboxPlace = mapboxData?.isNotEmpty == true ? mapboxData[0] : null;
+
+    List<String> images = [];
+    if (pexelsData != null) {
+      images.addAll((pexelsData as List)
+          .map((image) => (image['src']['medium'] ?? '').toString())
+          .where((url) => url.isNotEmpty));
+    }
+    if (unsplashData != null) {
+      images.addAll((unsplashData as List)
+          .map((image) => (image['urls']['regular'] ?? '').toString())
+          .where((url) => url.isNotEmpty));
+    }
+    images = images.take(_imagesPerRequest).toList();
+
+    List<String> categories = [];
+    if (geoapifyPlace != null && geoapifyPlace['categories'] is Iterable) {
+      categories.addAll((geoapifyPlace['categories'] as Iterable)
+          .map((c) => c.toString())
+          .where((c) => c.isNotEmpty));
+    } else if (mapboxPlace != null && mapboxPlace['context'] is Iterable) {
+      categories.addAll((mapboxPlace['context'] as Iterable)
+          .map((item) => (item['id'] ?? '').toString())
+          .where((id) => id.isNotEmpty));
+    }
+
+    return {
+      'name':
+          (geoapifyPlace?['name'] ?? mapboxPlace?['place_name'] ?? 'Unknown')
+              .toString(),
+      'lat':
+          (geoapifyPlace?['lat'] ?? mapboxPlace?['center']?[1] ?? 0).toString(),
+      'lon':
+          (geoapifyPlace?['lon'] ?? mapboxPlace?['center']?[0] ?? 0).toString(),
+      'formatted':
+          (geoapifyPlace?['formatted'] ?? mapboxPlace?['place_name'] ?? '')
+              .toString(),
+      'categories': categories,
+      'country': (geoapifyPlace?['country'] ?? 'Kenya').toString(),
+      'state': (geoapifyPlace?['state'] ?? '').toString(),
+      'city': (geoapifyPlace?['city'] ?? '').toString(),
+      'postcode': (geoapifyPlace?['postcode'] ?? '').toString(),
+      'description': (mapboxPlace?['text'] ?? '').toString(),
+      'images': images,
+    };
   }
 
   static Future<List<Map<String, dynamic>>> fetchAllPlaces(
@@ -198,7 +296,7 @@ class PlaceImageService {
       String query, String userId) async {
     try {
       final details = await fetchPlaceDetails(query, userId);
-      return [details];
+      return details.isNotEmpty ? [details] : [];
     } catch (e) {
       print("Error searching places: $e");
       return [];
