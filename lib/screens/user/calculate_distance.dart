@@ -84,16 +84,12 @@ class CalculateDistanceState extends State<CalculateDistance> {
         );
 
         double distanceInKm = distanceInMeters / 1000;
-        double durationDriving = distanceInKm / 60;
-        double durationMotorcycle = distanceInKm / 50;
-        double durationWalking = distanceInKm / 5;
 
         setState(() {
-          distance = '${distanceInKm.toStringAsFixed(2)} km';
-          durationDrivingStr = '${durationDriving.toStringAsFixed(2)} hours';
-          durationMotorcycleStr =
-              '${durationMotorcycle.toStringAsFixed(2)} hours';
-          durationWalkingStr = '${durationWalking.toStringAsFixed(2)} hours';
+          distance = formatDistance(distanceInKm);
+          durationDrivingStr = formatDuration(distanceInKm / 60);
+          durationMotorcycleStr = formatDuration(distanceInKm / 50);
+          durationWalkingStr = formatDuration(distanceInKm / 5);
         });
       } else {
         throw Exception('Location not found');
@@ -106,6 +102,46 @@ class CalculateDistanceState extends State<CalculateDistance> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  String formatDistance(double distanceInKm) {
+    if (distanceInKm < 0.1) {
+      return '${(distanceInKm * 1000).toStringAsFixed(0)} m';
+    } else if (distanceInKm < 1) {
+      return '${(distanceInKm * 1000).toStringAsFixed(0)} m';
+    } else if (distanceInKm < 10) {
+      return '${distanceInKm.toStringAsFixed(2)} km';
+    } else if (distanceInKm < 100) {
+      return '${distanceInKm.toStringAsFixed(1)} km';
+    } else {
+      return '${distanceInKm.toStringAsFixed(0)} km';
+    }
+  }
+
+  String formatDuration(double hours) {
+    if (hours < 1 / 60) {
+      int seconds = (hours * 3600).round();
+      return '$seconds second${seconds != 1 ? 's' : ''}';
+    } else if (hours < 1) {
+      int minutes = (hours * 60).round();
+      return '$minutes minute${minutes != 1 ? 's' : ''}';
+    } else if (hours < 24) {
+      int wholeHours = hours.floor();
+      int minutes = ((hours - wholeHours) * 60).round();
+      return '$wholeHours hour${wholeHours != 1 ? 's' : ''}'
+          '${minutes > 0 ? ' $minutes minute${minutes != 1 ? 's' : ''}' : ''}';
+    } else if (hours < 168) {
+      // Less than a week
+      int days = (hours / 24).floor();
+      int remainingHours = (hours % 24).round();
+      return '$days day${days != 1 ? 's' : ''}'
+          '${remainingHours > 0 ? ' $remainingHours hour${remainingHours != 1 ? 's' : ''}' : ''}';
+    } else {
+      int weeks = (hours / 168).floor();
+      int remainingDays = ((hours % 168) / 24).round();
+      return '$weeks week${weeks != 1 ? 's' : ''}'
+          '${remainingDays > 0 ? ' $remainingDays day${remainingDays != 1 ? 's' : ''}' : ''}';
     }
   }
 
