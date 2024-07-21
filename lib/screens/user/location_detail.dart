@@ -64,6 +64,26 @@ class LocationDetail extends StatelessWidget {
                           height: 200,
                           width: double.infinity,
                           fit: BoxFit.cover,
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              height: 200,
+                              color: Colors.grey[300],
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes !=
+                                          null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                  valueColor:
+                                      const AlwaysStoppedAnimation<Color>(
+                                          AppColors.accent),
+                                ),
+                              ),
+                            );
+                          },
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               height: 200,

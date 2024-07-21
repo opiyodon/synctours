@@ -13,6 +13,8 @@ class PlaceImageService {
   static final String mapboxApiKey = dotenv.env['MAPBOX_API_KEY']!;
   static const String mapboxApiUrl =
       'https://api.mapbox.com/geocoding/v5/mapbox.places';
+  static final String pexelsApiKey = dotenv.env['PEXELS_API_KEY']!;
+  static const String pexelsApiUrl = 'https://api.pexels.com/v1/search';
   static final String unsplashApiKey = dotenv.env['UNSPLASH_API_KEY']!;
   static const String unsplashApiUrl = 'https://api.unsplash.com/search/photos';
 
@@ -55,7 +57,8 @@ class PlaceImageService {
   }
 
   static String generatePlaceId(Map<String, dynamic> place) {
-    String uniqueString = '${place['name']}${place['formatted']}${place['country']}';
+    String uniqueString =
+        '${place['name']}${place['formatted']}${place['country']}';
     var bytes = utf8.encode(uniqueString);
     var digest = sha256.convert(bytes);
     return digest.toString().substring(0, 16);
@@ -76,21 +79,39 @@ class PlaceImageService {
             '$mapboxApiUrl/$query.json?access_token=$mapboxApiKey&country=KE'),
       );
 
+      final pexelsResponse = await http.get(
+        Uri.parse('$pexelsApiUrl?query=$query&per_page=15'),
+        headers: {'Authorization': pexelsApiKey},
+      );
+
       final unsplashResponse = await http.get(
         Uri.parse(
-            '$unsplashApiUrl?query=$query&client_id=$unsplashApiKey&per_page=5'),
+            '$unsplashApiUrl?query=$query&client_id=$unsplashApiKey&per_page=15'),
       );
 
       if (geoapifyResponse.statusCode == 200 &&
           mapboxResponse.statusCode == 200 &&
+          pexelsResponse.statusCode == 200 &&
           unsplashResponse.statusCode == 200) {
         final geoapifyData = json.decode(geoapifyResponse.body)['features'];
         final mapboxData = json.decode(mapboxResponse.body)['features'];
+        final pexelsData = json.decode(pexelsResponse.body)['photos'];
         final unsplashData = json.decode(unsplashResponse.body)['results'];
 
         if (geoapifyData.isNotEmpty && mapboxData.isNotEmpty) {
           final geoapifyPlace = geoapifyData[0]['properties'];
           final mapboxPlace = mapboxData[0];
+
+          List<String> images = [];
+          // Add Pexels images first
+          images.addAll(
+              pexelsData.map((image) => image['src']['medium'] as String));
+          // Add Unsplash images to fill up to 15 if needed
+          if (images.length < 15) {
+            images.addAll(unsplashData
+                .map((image) => image['urls']['regular'] as String)
+                .take(15 - images.length));
+          }
 
           final placeDetails = {
             'name':
@@ -106,8 +127,7 @@ class PlaceImageService {
             'city': geoapifyPlace['city'] ?? '',
             'postcode': geoapifyPlace['postcode'] ?? '',
             'description': mapboxPlace['text'] ?? '',
-            'images':
-                unsplashData.map((image) => image['urls']['regular']).toList(),
+            'images': images,
           };
 
           placeDetails['id'] = generatePlaceId(placeDetails);
