@@ -237,7 +237,7 @@ class VideoSearchState extends State<VideoSearch> {
                                             aspectRatio: 16 / 9,
                                             child: FadeInImage(
                                               placeholder: const AssetImage(
-                                                  'assets/placeholder_thumbnail.png'),
+                                                  'assets/icon/placeholder_thumbnail.png'),
                                               image: NetworkImage(
                                                   video.thumbnails.highResUrl),
                                               fit: BoxFit.cover,
@@ -255,7 +255,7 @@ class VideoSearchState extends State<VideoSearch> {
                                                       errorBuilder: (context,
                                                           error, stackTrace) {
                                                         return Image.asset(
-                                                          'assets/placeholder_thumbnail.png',
+                                                          'assets/icon/placeholder_thumbnail.png',
                                                           fit: BoxFit.cover,
                                                         );
                                                       },
