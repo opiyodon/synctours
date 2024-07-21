@@ -84,6 +84,7 @@ class FindCurrentLocationState extends State<FindCurrentLocation> {
       mapController.move(currentPosition!, 12);
       await updatePlaceName(currentPosition!);
     } catch (e) {
+      debugPrint("Error fetching location: $e");
       if (!mounted) return;
       _showDefaultLocation();
     }
@@ -92,7 +93,7 @@ class FindCurrentLocationState extends State<FindCurrentLocation> {
   void _showDefaultLocation() {
     setState(() {
       currentPosition = defaultLocation;
-      locationName = "Nairobi";
+      locationName = "Nakuru";
       country = "Kenya";
       continent = "Africa";
       isLoading = false;

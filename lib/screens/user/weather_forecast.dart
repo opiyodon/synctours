@@ -26,7 +26,7 @@ class WeatherForecastState extends State<WeatherForecast> {
   List<ForecastData> forecastData = [];
   bool isLoading = true;
   final LatLng defaultLocation =
-  const LatLng(-1.2921, 36.8219); // Nairobi, Kenya
+      const LatLng(-1.2921, 36.8219); // Nairobi, Kenya
 
   @override
   void initState() {
@@ -35,11 +35,7 @@ class WeatherForecastState extends State<WeatherForecast> {
   }
 
   Future<void> _initializeLocationAndWeather() async {
-    if (widget.location != null) {
-      await fetchWeatherData(widget.location!);
-    } else {
-      await _requestLocationPermission();
-    }
+    await _requestLocationPermission();
   }
 
   Future<void> _requestLocationPermission() async {
@@ -225,11 +221,11 @@ class WeatherForecastState extends State<WeatherForecast> {
                 child: isLoading
                     ? const Loading()
                     : weatherData != null
-                    ? buildWeatherContent()
-                    : const Center(
-                  child: Text(
-                      'Unable to fetch weather data. Please try again.'),
-                ),
+                        ? buildWeatherContent()
+                        : const Center(
+                            child: Text(
+                                'Unable to fetch weather data. Please try again.'),
+                          ),
               ),
             ],
           ),
@@ -317,13 +313,13 @@ class WeatherForecastState extends State<WeatherForecast> {
                 title: 'Wind',
                 value: '${weatherData!.windSpeed} mph',
                 imageUrl:
-                'https://cdn.usegalileo.ai/stability/e2f5c438-6425-478d-b1ea-9137627a1a6f.png',
+                    'https://cdn.usegalileo.ai/stability/e2f5c438-6425-478d-b1ea-9137627a1a6f.png',
               ),
               InfoCard(
                 title: 'Humidity',
                 value: '${weatherData!.humidity}%',
                 imageUrl:
-                'https://cdn.usegalileo.ai/stability/242da4ba-92f9-4014-b959-df0cdbb78e16.png',
+                    'https://cdn.usegalileo.ai/stability/242da4ba-92f9-4014-b959-df0cdbb78e16.png',
               ),
             ],
           ),
