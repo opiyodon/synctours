@@ -67,7 +67,7 @@ class HomeState extends State<Home> {
         try {
           await DatabaseService(uid: user.uid!).saveRecentSearch(query);
         } catch (e) {
-          print('Error saving recent search: $e');
+          debugPrint('Error saving recent search: $e');
         }
       }
       Navigator.push(
@@ -85,7 +85,7 @@ class HomeState extends State<Home> {
       try {
         await DatabaseService(uid: user.uid!).clearRecentSearches();
       } catch (e) {
-        print('Error clearing recent searches: $e');
+        debugPrint('Error clearing recent searches: $e');
       }
     }
   }
@@ -300,7 +300,7 @@ class HomeState extends State<Home> {
                                                 AppColors.accent),
                                       );
                                     } else if (snapshot.hasError) {
-                                      print(
+                                      debugPrint(
                                           'Error fetching recent searches: ${snapshot.error}');
                                       return const Text(
                                           'Error loading recent searches',
