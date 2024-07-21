@@ -82,7 +82,7 @@ class VideoSearchState extends State<VideoSearch> {
           return Center(
             child: Text(
               errorMessage,
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
           );
         },
@@ -115,16 +115,16 @@ class VideoSearchState extends State<VideoSearch> {
 
         return Scaffold(
           appBar: isPortrait
-              ? CustomAppBar(
+              ? const CustomAppBar(
                   title: 'Video Search',
                   actions: [],
                 )
               : null,
-          drawer: isPortrait ? CustomDrawer() : null,
+          drawer: isPortrait ? const CustomDrawer() : null,
           body: RefreshIndicator(
             onRefresh: () => searchVideos(_searchedLocation),
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFFF4EFE6), Color(0xFFFFFFFF)],
                   begin: Alignment.topCenter,
@@ -159,15 +159,15 @@ class VideoSearchState extends State<VideoSearch> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Row(
                         children: [
-                          Icon(Icons.video_library,
+                          const Icon(Icons.video_library,
                               color: Color(0xFF1C160C), size: 24),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               _searchedLocation.isEmpty
                                   ? 'All Videos'
                                   : _searchedLocation,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Color(0xFF1C160C),
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -182,7 +182,7 @@ class VideoSearchState extends State<VideoSearch> {
                   if (_selectedVideo != null)
                     Expanded(
                       child: isFetchingVideo
-                          ? Loading()
+                          ? const Loading()
                           : AspectRatio(
                               aspectRatio: isPortrait ? 16 / 9 : 16 / 9,
                               child: Chewie(controller: _chewieController!),
@@ -193,8 +193,8 @@ class VideoSearchState extends State<VideoSearch> {
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton.icon(
                         onPressed: _closeVideoPlayer,
-                        icon: Icon(Icons.close, color: AppColors.buttonText),
-                        label: Text(
+                        icon: const Icon(Icons.close, color: AppColors.buttonText),
+                        label: const Text(
                           'Close',
                           style: TextStyle(color: AppColors.buttonText),
                         ),
@@ -206,7 +206,7 @@ class VideoSearchState extends State<VideoSearch> {
                   if (_selectedVideo == null)
                     Expanded(
                       child: isLoading
-                          ? Loading()
+                          ? const Loading()
                           : GridView.builder(
                               padding: const EdgeInsets.all(16.0),
                               gridDelegate:
@@ -231,13 +231,13 @@ class VideoSearchState extends State<VideoSearch> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         ClipRRect(
-                                          borderRadius: BorderRadius.vertical(
+                                          borderRadius: const BorderRadius.vertical(
                                               top: Radius.circular(15.0)),
                                           child: AspectRatio(
                                             aspectRatio: 16 / 9,
                                             child: FadeInImage(
-                                              placeholder: AssetImage(
-                                                  'assets/placeholder_thumbnail.png'),
+                                              placeholder: const AssetImage(
+                                                  'assets/icon/placeholder_thumbnail.png'),
                                               image: NetworkImage(
                                                   video.thumbnails.highResUrl),
                                               fit: BoxFit.cover,
@@ -255,7 +255,7 @@ class VideoSearchState extends State<VideoSearch> {
                                                       errorBuilder: (context,
                                                           error, stackTrace) {
                                                         return Image.asset(
-                                                          'assets/placeholder_thumbnail.png',
+                                                          'assets/icon/placeholder_thumbnail.png',
                                                           fit: BoxFit.cover,
                                                         );
                                                       },
@@ -278,12 +278,12 @@ class VideoSearchState extends State<VideoSearch> {
                                                   maxLines: 2,
                                                   overflow:
                                                       TextOverflow.ellipsis,
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       fontSize: 14),
                                                 ),
-                                                SizedBox(height: 4),
+                                                const SizedBox(height: 4),
                                                 Text(
                                                   video.author,
                                                   maxLines: 1,
